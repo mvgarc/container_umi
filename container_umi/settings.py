@@ -17,7 +17,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # Agrega aquí tu app
 ]
 
 MIDDLEWARE = [
@@ -61,7 +60,7 @@ DATABASES = {
     }
 }
 
-# Validación de contraseñas
+# Validación de contrasenas
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',},
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',},
@@ -75,7 +74,7 @@ TIME_ZONE = 'America/Caracas'
 USE_I18N = True
 USE_TZ = True
 
-# Archivos estáticos
+# Archivos estaticos
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
