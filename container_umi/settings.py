@@ -1,6 +1,7 @@
 from pathlib import Path
 from decouple import config
 import os
+from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -49,7 +50,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'container_umi.wsgi.application'
 
-# Base de datos (PostgreSQL)
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
