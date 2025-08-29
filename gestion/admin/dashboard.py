@@ -8,6 +8,9 @@ class DashboardAdminSite(AdminSite):
     site_title = "UMI Admin"
     index_title = "Dashboard"
 
+    def has_permission(self, request):
+        return request.user.is_active and request.user.is_staff
+
     def get_urls(self):
         urls = super().get_urls()
         custom_urls = [
