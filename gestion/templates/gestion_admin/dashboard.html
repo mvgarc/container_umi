@@ -1,0 +1,9 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+<h1>📊 Dashboard</h1>
+<ul>
+    <li>Contenedores pendientes: {{ contenedores_pendientes }}</li>
+    <li>Pagos pendientes: {{ pagos_pendientes }}</li>
+</ul>
+{% endblock %}
