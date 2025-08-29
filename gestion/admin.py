@@ -1,13 +1,21 @@
 from django.contrib import admin
 from .models import Contenedor, Documento, PlanPago
 
+class DocumentoInline(admin.TabularInline):
+    model = Documento
+    extra = 1
+
+class PlanPagoInline(admin.TabularInline):
+    model = PlanPago
+    extra = 1
+
 @admin.register(Contenedor)
 class ContenedorAdmin(admin.ModelAdmin):
     list_display = ('codigo', 'descripcion', 'fecha_pedido', 'fecha_llegada_estimada', 'estado')
     list_filter = ('estado', 'fecha_pedido', 'fecha_llegada_estimada')
     search_fields = ('codigo', 'descripcion')
     ordering = ('-fecha_pedido',)
-
+    inlines = [DocumentoInline, PlanPagoInline]
 
 @admin.register(Documento)
 class DocumentoAdmin(admin.ModelAdmin):
@@ -15,7 +23,6 @@ class DocumentoAdmin(admin.ModelAdmin):
     list_filter = ('obligatorio', 'fecha_subida')
     search_fields = ('nombre', 'contenedor__codigo')
     date_hierarchy = 'fecha_subida'
-
 
 @admin.register(PlanPago)
 class PlanPagoAdmin(admin.ModelAdmin):
