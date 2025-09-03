@@ -1,7 +1,8 @@
 from django.contrib import admin
+from .dashboard import custom_admin_site
 from ..models import Contenedor, Documento, PlanPago
 
-@admin.register(Contenedor)
+@custom_admin_site.register(Contenedor)
 class ContenedorAdmin(admin.ModelAdmin):
     list_display = ('codigo', 'descripcion', 'fecha_pedido', 'fecha_llegada_estimada', 'estado')
     list_filter = ('estado', 'fecha_pedido', 'fecha_llegada_estimada')
@@ -9,7 +10,7 @@ class ContenedorAdmin(admin.ModelAdmin):
     ordering = ('-fecha_pedido',)
 
 
-@admin.register(Documento)
+@custom_admin_site.register(Documento)
 class DocumentoAdmin(admin.ModelAdmin):
     list_display = ('nombre', 'contenedor', 'obligatorio', 'fecha_subida')
     list_filter = ('obligatorio', 'fecha_subida')
@@ -17,7 +18,7 @@ class DocumentoAdmin(admin.ModelAdmin):
     date_hierarchy = 'fecha_subida'
 
 
-@admin.register(PlanPago)
+@custom_admin_site.register(PlanPago)
 class PlanPagoAdmin(admin.ModelAdmin):
     list_display = ('contenedor', 'fecha_pago', 'monto', 'pagado')
     list_filter = ('pagado', 'fecha_pago')
