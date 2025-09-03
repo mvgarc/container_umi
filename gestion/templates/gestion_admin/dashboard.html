@@ -1,9 +1,42 @@
 {% extends "admin/base_site.html" %}
 
 {% block content %}
-<h1>📊 Dashboard</h1>
-<ul>
-    <li>Contenedores pendientes: {{ contenedores_pendientes }}</li>
-    <li>Pagos pendientes: {{ pagos_pendientes }}</li>
-</ul>
+<h1>📊 Dashboard General</h1>
+
+<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 20px;">
+    <div style="padding: 20px; background: #f8f9fa; border-radius: 10px;">
+        <h2>Total Contenedores</h2>
+        <p><b>{{ total_contenedores }}</b></p>
+    </div>
+
+    <div style="padding: 20px; background: #f8f9fa; border-radius: 10px;">
+        <h2>Contenedores Pendientes</h2>
+        <p><b>{{ pendientes }}</b></p>
+    </div>
+
+    <div style="padding: 20px; background: #f8f9fa; border-radius: 10px;">
+        <h2>En Tránsito</h2>
+        <p><b>{{ en_transito }}</b></p>
+    </div>
+
+    <div style="padding: 20px; background: #f8f9fa; border-radius: 10px;">
+        <h2>Entregados</h2>
+        <p><b>{{ entregados }}</b></p>
+    </div>
+
+    <div style="padding: 20px; background: #f8f9fa; border-radius: 10px;">
+        <h2>Pagos Pendientes</h2>
+        <p><b>{{ pagos_pendientes }}</b></p>
+    </div>
+
+    <div style="padding: 20px; background: #f8f9fa; border-radius: 10px;">
+        <h2>Pagos Realizados</h2>
+        <p><b>{{ pagos_realizados }}</b></p>
+    </div>
+
+    <div style="padding: 20px; background: #f8f9fa; border-radius: 10px; grid-column: span 3;">
+        <h2>Documentos Obligatorios</h2>
+        <p><b>{{ documentos_obligatorios }}</b></p>
+    </div>
+</div>
 {% endblock %}
