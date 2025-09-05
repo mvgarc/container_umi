@@ -11,27 +11,25 @@ class CustomAdminSite(AdminSite):
         urls = super().get_urls()
 
         def dashboard_view(request):
-            # Aquí se importan los modelos para evitar el error de inicio
+            # Importamos aquí para evitar errores circulares
             from gestion.models import Contenedor, PlanPago, Documento
 
-            # Obtén los datos de la base de datos
             total_contenedores = Contenedor.objects.count()
-            contenedores_pendientes = Contenedor.objects.filter(estado='Pendiente').count()
-            contenedores_en_transito = Contenedor.objects.filter(estado='En tránsito').count()
-            contenedores_entregados = Contenedor.objects.filter(estado='Entregado').count()
-            
+            pendientes = Contenedor.objects.filter(estado="pendiente").count()
+            en_transito = Contenedor.objects.filter(estado="en_transito").count()
+            entregados = Contenedor.objects.filter(estado="entregado").count()
+
             pagos_pendientes = PlanPago.objects.filter(pagado=False).count()
             pagos_realizados = PlanPago.objects.filter(pagado=True).count()
-            
             documentos_obligatorios = Documento.objects.filter(obligatorio=True).count()
 
             context = dict(
                 self.each_context(request),
                 title="Dashboard UMI",
                 total_contenedores=total_contenedores,
-                pendientes=contenedores_pendientes,
-                en_transito=contenedores_en_transito,
-                entregados=contenedores_entregados,
+                pendientes=pendientes,
+                en_transito=en_transito,
+                entregados=entregados,
                 pagos_pendientes=pagos_pendientes,
                 pagos_realizados=pagos_realizados,
                 documentos_obligatorios=documentos_obligatorios,
