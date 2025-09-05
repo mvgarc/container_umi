@@ -15,6 +15,14 @@ class CustomAdminSite(AdminSite):
             context = dict(
                 self.each_context(request),
                 title="Dashboard UMI",
+                # Aquí podrías pasar datos reales de tus modelos
+                total_contenedores=0,
+                pendientes=0,
+                en_transito=0,
+                entregados=0,
+                pagos_pendientes=0,
+                pagos_realizados=0,
+                documentos_obligatorios=0,
             )
             return TemplateResponse(request, "gestion_admin/dashboard.html", context)
 
