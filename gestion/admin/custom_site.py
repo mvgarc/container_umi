@@ -2,9 +2,6 @@ from django.contrib.admin import AdminSite
 from django.urls import path
 from django.template.response import TemplateResponse
 
-
-from gestion.models import Contenedor, PlanPago, Documento
-
 class CustomAdminSite(AdminSite):
     site_header = "Panel de Administración UMI"
     site_title = "UMI Admin"
@@ -14,6 +11,9 @@ class CustomAdminSite(AdminSite):
         urls = super().get_urls()
 
         def dashboard_view(request):
+            # Aquí se importan los modelos para evitar el error de inicio
+            from gestion.models import Contenedor, PlanPago, Documento
+
             # Obtén los datos de la base de datos
             total_contenedores = Contenedor.objects.count()
             contenedores_pendientes = Contenedor.objects.filter(estado='Pendiente').count()
