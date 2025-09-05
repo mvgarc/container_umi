@@ -42,6 +42,3 @@ class CustomAdminSite(AdminSite):
             path("", dashboard_view, name="dashboard"),
         ]
         return custom_urls + urls
-
-custom_admin_site = CustomAdminSite(name="custom_admin")
-custom_admin_site.index_template = "gestion_admin/dashboard.html"
