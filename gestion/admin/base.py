@@ -1,6 +1,6 @@
 from django.contrib import admin
-from .dashboard import custom_admin_site
 from ..models import Contenedor, Documento, PlanPago
+from .custom_site import custom_admin_site 
 
 @custom_admin_site.register(Contenedor)
 class ContenedorAdmin(admin.ModelAdmin):

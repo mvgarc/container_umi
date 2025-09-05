@@ -1,2 +1,3 @@
-from .base import * 
-from .dashboard import custom_admin_site
+from .custom_site import custom_admin_site
+from . import base
+from . import dashboard

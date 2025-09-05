@@ -1,17 +1,15 @@
-from django.contrib.admin import AdminSite
-from django.utils.translation import gettext_lazy as _
+from django.urls import path
+from django.template.response import TemplateResponse
+from .custom_site import custom_admin_site
 
-class DashboardAdminSite(AdminSite):
-    site_header = "Panel de Administración"
-    site_title = "UMI Admin"
-    index_title = "Dashboard"
+def dashboard_view(request):
+    context = dict(
+        custom_admin_site.each_context(request),
+        title="Dashboard UMI",
+    )
+    return TemplateResponse(request, "gestion_admin/dashboard.html", context)
 
-    def has_permission(self, request):
-        """
-        Permite acceso a cualquier usuario activo y staff.
-        Los superusuarios también entran aquí.
-        """
-        return request.user.is_active and request.user.is_staff
-
-
-custom_admin_site = DashboardAdminSite(name="custom_admin")
+# Agregar la URL personalizada
+custom_admin_site.get_urls = lambda: [
+    path("", dashboard_view, name="dashboard"),
+]
