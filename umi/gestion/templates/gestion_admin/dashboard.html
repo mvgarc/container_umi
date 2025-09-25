@@ -3,26 +3,11 @@
 {% block content %}
 <h1 style="margin-bottom: 20px;">📊 Dashboard General</h1>
 
-<!-- Tarjetas de métricas -->
 <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 30px;">
+    
     <div style="padding: 20px; background: #f8f9fa; border-radius: 10px; text-align: center;">
         <h3>Total Contenedores</h3>
         <p style="font-size: 24px; font-weight: bold;">{{ total_contenedores }}</p>
-    </div>
-
-    <div style="padding: 20px; background: #f8f9fa; border-radius: 10px; text-align: center;">
-        <h3>Contenedores Pendientes</h3>
-        <p style="font-size: 24px; font-weight: bold; color: #d9534f;">{{ pendientes }}</p>
-    </div>
-
-    <div style="padding: 20px; background: #f8f9fa; border-radius: 10px; text-align: center;">
-        <h3>En Tránsito</h3>
-        <p style="font-size: 24px; font-weight: bold; color: #f0ad4e;">{{ en_transito }}</p>
-    </div>
-
-    <div style="padding: 20px; background: #f8f9fa; border-radius: 10px; text-align: center;">
-        <h3>Entregados</h3>
-        <p style="font-size: 24px; font-weight: bold; color: #5cb85c;">{{ entregados }}</p>
     </div>
 
     <div style="padding: 20px; background: #f8f9fa; border-radius: 10px; text-align: center;">
@@ -44,34 +29,41 @@
         <h3>Navieras Registradas</h3>
         <p style="font-size: 24px; font-weight: bold;">{{ navieras }}</p>
     </div>
-</div>
+    
+    <div style="padding: 20px; background: #fff3cd; border-radius: 10px; text-align: center; grid-column: span 3;">
+        <h3 style="color: #856404;">Documentos Próximos a Vencer</h3>
+        <p style="font-size: 24px; font-weight: bold;">{{ documentos_proximos }}</p>
+    </div>
 
-<!-- Gráficas -->
+    <div style="padding: 20px; background: #f8d7da; border-radius: 10px; text-align: center; grid-column: span 3;">
+        <h3 style="color: #721c24;"> Documentos Vencidos</h3>
+        <p style="font-size: 24px; font-weight: bold;">{{ documentos_vencidos }}</p>
+    </div>
+    </div>
+
 <h2>📈 Gráficas</h2>
 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px;">
     <canvas id="contenedoresChart"></canvas>
     <canvas id="pagosChart"></canvas>
 </div>
 
-<!-- Evolución de Pagos -->
 <div style="grid-column: span 2; margin-top: 30px;">
     <h3>Evolución de Pagos</h3>
     <canvas id="evolucionPagosChart"></canvas>
 </div>
 
-<!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    // Contenedores (dona)
+    // Contenedores (pie)
     const contenedoresCtx = document.getElementById('contenedoresChart').getContext('2d');
     new Chart(contenedoresCtx, {
-        type: 'doughnut',
+        type: 'pie',
         data: {
-            labels: ['Pendientes', 'En tránsito', 'Entregados'],
+            labels: {{ estados_labels|safe }},
             datasets: [{
                 label: 'Contenedores',
-                data: ["{{ pendientes }}", "{{ en_transito }}", "{{ entregados }}"],
-                backgroundColor: ['#d9534f', '#f0ad4e', '#5cb85c'],
+                data: {{ estados_data|safe }},
+                backgroundColor: ['#f0ad4e','#5bc0de','#0275d8','#5cb85c','#d9534f','#6c757d'],
                 borderWidth: 1
             }]
         },
@@ -86,7 +78,8 @@
             labels: ['Pendientes', 'Realizados'],
             datasets: [{
                 label: 'Pagos',
-                data: ["{{ pagos_pendientes }}", "{{ pagos_realizados }}"],
+                // Se eliminan las comillas porque ya son números
+                data: [{{ pagos_pendientes }}, {{ pagos_realizados }}], 
                 backgroundColor: ['#d9534f', '#5cb85c'],
                 borderWidth: 1
             }]

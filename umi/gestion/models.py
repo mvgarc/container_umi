@@ -50,6 +50,7 @@ class Document(models.Model):
     file = models.FileField(upload_to="documents/")
     required = models.BooleanField(default=True, verbose_name="Es obligatorio")
     uploaded_at = models.DateTimeField(auto_now_add=True)
+    expiry_date = models.DateField(blank=True, null=True, verbose_name="Fecha de vencimiento") 
 
     def __str__(self):
         return f"{self.name} ({'Obligatorio' if self.required else 'Opcional'})"
