@@ -1,7 +1,7 @@
 import json
 from datetime import date, timedelta
 from django.contrib.admin import AdminSite
-from django.urls import path, reverse
+from django.urls import path, reverse 
 from django.template.response import TemplateResponse
 from django.db.models import Sum, Count
 from django.utils.dateformat import DateFormat
@@ -69,17 +69,18 @@ class CustomAdminSite(AdminSite):
             pagos_pendientes_data = [pagos_pendientes] 
             pagos_realizados_data = [pagos_realizados]
 
+            APP_NAME = "gestion" 
+            SITE_NAMESPACE = "custom_admin" 
 
-            # --- URLs seguras con reverse ---
             urls_acceso = {
-                "container_list": reverse("admin:gestion_container_changelist"),
-                "container_add": reverse("admin:gestion_container_add"),
-                "document_list": reverse("admin:gestion_document_changelist"),
-                "document_add": reverse("admin:gestion_document_add"),
-                "shippingline_list": reverse("admin:gestion_shippingline_changelist"),
-                "shippingline_add": reverse("admin:gestion_shippingline_add"),
-                "paymentplan_list": reverse("admin:gestion_paymentplan_changelist"),
-                "paymentplan_add": reverse("admin:gestion_paymentplan_add"),
+                "container_list": reverse("custom_admin:gestion_container_changelist"),
+                "container_add": reverse("custom_admin:gestion_container_add"),
+                "document_list": reverse("custom_admin:gestion_document_changelist"),
+                "document_add": reverse("custom_admin:gestion_document_add"),
+                "shippingline_list": reverse("custom_admin:gestion_shippingline_changelist"),
+                "shippingline_add": reverse("custom_admin:gestion_shippingline_add"),
+                "paymentplan_list": reverse("custom_admin:gestion_paymentplan_changelist"),
+                "paymentplan_add": reverse("custom_admin:gestion_paymentplan_add"),
             }
 
             context = dict(
@@ -97,8 +98,8 @@ class CustomAdminSite(AdminSite):
                 estados_data=estados_data,
                 pagos_labels=pagos_labels,
                 pagos_data=pagos_data,
-                pagos_pendientes_data=pagos_pendientes_data, # Lista para json_script
-                pagos_realizados_data=pagos_realizados_data, # Lista para json_script
+                pagos_pendientes_data=pagos_pendientes_data,
+                pagos_realizados_data=pagos_realizados_data,
                 **urls_acceso
             )
             return TemplateResponse(request, "gestion_admin/dashboard.html", context)
