@@ -53,10 +53,16 @@
     <canvas id="pagosChart"></canvas>
 </div>
 
+<!-- Evolución de Pagos -->
+<div style="grid-column: span 2; margin-top: 30px;">
+    <h3>Evolución de Pagos</h3>
+    <canvas id="evolucionPagosChart"></canvas>
+</div>
+
 <!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    // Contenedores
+    // Contenedores (dona)
     const contenedoresCtx = document.getElementById('contenedoresChart').getContext('2d');
     new Chart(contenedoresCtx, {
         type: 'doughnut',
@@ -69,12 +75,10 @@
                 borderWidth: 1
             }]
         },
-        options: {
-            responsive: true
-        }
+        options: { responsive: true }
     });
 
-    // Pagos
+    // Pagos (barra)
     const pagosCtx = document.getElementById('pagosChart').getContext('2d');
     new Chart(pagosCtx, {
         type: 'bar',
@@ -89,9 +93,28 @@
         },
         options: {
             responsive: true,
-            scales: {
-                y: { beginAtZero: true }
-            }
+            scales: { y: { beginAtZero: true } }
+        }
+    });
+
+    // Evolución de Pagos (línea)
+    const evolucionCtx = document.getElementById('evolucionPagosChart').getContext('2d');
+    new Chart(evolucionCtx, {
+        type: 'line',
+        data: {
+            labels: {{ pagos_labels|safe }},
+            datasets: [{
+                label: 'Monto de Pagos',
+                data: {{ pagos_data|safe }},
+                borderColor: '#007bff',
+                backgroundColor: 'rgba(0, 123, 255, 0.2)',
+                fill: true,
+                tension: 0.3
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: { y: { beginAtZero: true } }
         }
     });
 </script>
