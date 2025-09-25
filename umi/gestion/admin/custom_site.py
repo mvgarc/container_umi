@@ -17,13 +17,17 @@ class CustomAdminSite(AdminSite):
         urls = super().get_urls()
 
         def dashboard_view(request):
-            # Métricas
+            # Métricas generales
             total_contenedores = Container.objects.count()
-            en_transito = Container.objects.filter(status="en_transito").count()
-            entregados = Container.objects.filter(status="entregado").count()
 
-            # Definimos "pendientes" como los que NO están entregados
-            pendientes = Container.objects.exclude(status="entregado").count()
+            estados = {
+                "En tránsito": Container.objects.filter(status="en_transito").count(),
+                "En puerto": Container.objects.filter(status="en_puerto").count(),
+                "En aduana": Container.objects.filter(status="en_aduana").count(),
+                "Entregado": Container.objects.filter(status="entregado").count(),
+                "Devuelto": Container.objects.filter(status="devuelto").count(),
+                "Retrasado": Container.objects.filter(status="retrasado").count(),
+            }
 
             pagos_pendientes = PaymentPlan.objects.filter(paid=False).count()
             pagos_realizados = PaymentPlan.objects.filter(paid=True).count()
@@ -40,7 +44,9 @@ class CustomAdminSite(AdminSite):
             pagos_labels = [DateFormat(p["due_date"]).format("d M Y") for p in pagos]
             pagos_data = [float(p["total"]) for p in pagos]
 
-            # Convertimos a JSON para Chart.js
+            # Convertimos a JSON
+            estados_labels_json = mark_safe(json.dumps(list(estados.keys())))
+            estados_data_json = mark_safe(json.dumps(list(estados.values())))
             pagos_labels_json = mark_safe(json.dumps(pagos_labels))
             pagos_data_json = mark_safe(json.dumps(pagos_data))
 
@@ -48,9 +54,8 @@ class CustomAdminSite(AdminSite):
                 self.each_context(request),
                 title="Dashboard UMI",
                 total_contenedores=total_contenedores,
-                pendientes=pendientes,
-                en_transito=en_transito,
-                entregados=entregados,
+                estados_labels=estados_labels_json,
+                estados_data=estados_data_json,
                 pagos_pendientes=pagos_pendientes,
                 pagos_realizados=pagos_realizados,
                 documentos_obligatorios=documentos_obligatorios,
