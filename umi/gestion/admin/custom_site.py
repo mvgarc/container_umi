@@ -1,11 +1,10 @@
 import json
+from datetime import date, timedelta
 from django.contrib.admin import AdminSite
-from django.urls import path
+from django.urls import path, reverse
 from django.template.response import TemplateResponse
 from django.db.models import Sum, Count
 from django.utils.dateformat import DateFormat
-from django.utils.safestring import mark_safe
-from datetime import date, timedelta
 from gestion.models import Container, PaymentPlan, Document, ShippingLine
 
 
@@ -25,9 +24,9 @@ class CustomAdminSite(AdminSite):
             documentos_obligatorios = Document.objects.filter(required=True).count()
             navieras = ShippingLine.objects.count()
 
-            # --- Lógica de Documentos Vencidos/Próximos (NUEVO) ---
+            # --- Documentos vencidos / próximos ---
             today = date.today()
-            upcoming_deadline = today + timedelta(days=30) # Próximo a vencer: en los próximos 30 días
+            upcoming_deadline = today + timedelta(days=30)
 
             documentos_proximos = Document.objects.filter(
                 expiry_date__isnull=False,
@@ -39,14 +38,13 @@ class CustomAdminSite(AdminSite):
                 expiry_date__isnull=False,
                 expiry_date__lt=today
             ).count()
-            
+
             # --- Contenedores por estado ---
             estados_data_raw = (
                 Container.objects.values("status")
                 .annotate(total=Count("id"))
                 .order_by("status")
             )
-            
             status_map = {
                 'en_transito': 'En Tránsito',
                 'en_puerto': 'En Puerto',
@@ -55,24 +53,29 @@ class CustomAdminSite(AdminSite):
                 'devuelto': 'Devuelto',
                 'retrasado': 'Retrasado',
             }
-
             estados_labels = [status_map.get(c['status'], c['status']) for c in estados_data_raw]
             estados_data = [c['total'] for c in estados_data_raw]
 
-            # --- Evolución de Pagos ---
+            # --- Evolución de pagos ---
             pagos = (
-                PaymentPlan.objects.values("due_date")
+                PaymentPlan.objects.filter(paid=True).values("due_date") # Filtrar solo realizados para la evolución
                 .order_by("due_date")
                 .annotate(total=Sum("amount"))
             )
             pagos_labels = [DateFormat(p["due_date"]).format("d M Y") for p in pagos]
             pagos_data = [float(p["total"]) for p in pagos]
-            
-            # --- Pasar a JSON seguro ---
-            estados_labels_json = mark_safe(json.dumps(estados_labels))
-            estados_data_json = mark_safe(json.dumps(estados_data))
-            pagos_labels_json = mark_safe(json.dumps(pagos_labels))
-            pagos_data_json = mark_safe(json.dumps(pagos_data))
+
+            # --- URLs seguras con reverse ---
+            urls_acceso = {
+                "container_list": reverse("admin:gestion_container_changelist"),
+                "container_add": reverse("admin:gestion_container_add"),
+                "document_list": reverse("admin:gestion_document_changelist"),
+                "document_add": reverse("admin:gestion_document_add"),
+                "shippingline_list": reverse("admin:gestion_shippingline_changelist"),
+                "shippingline_add": reverse("admin:gestion_shippingline_add"),
+                "paymentplan_list": reverse("admin:gestion_paymentplan_changelist"),
+                "paymentplan_add": reverse("admin:gestion_paymentplan_add"),
+            }
 
             context = dict(
                 self.each_context(request),
@@ -84,16 +87,16 @@ class CustomAdminSite(AdminSite):
                 navieras=navieras,
                 documentos_proximos=documentos_proximos,
                 documentos_vencidos=documentos_vencidos,
-                estados_labels=estados_labels_json,
-                estados_data=estados_data_json,
-                pagos_labels=pagos_labels_json,
-                pagos_data=pagos_data_json,
+                # Datos para json_script (listas de Python nativas)
+                estados_labels=estados_labels,
+                estados_data=estados_data,
+                pagos_labels=pagos_labels,
+                pagos_data=pagos_data,
+                **urls_acceso
             )
             return TemplateResponse(request, "gestion_admin/dashboard.html", context)
 
-        custom_urls = [
-            path("", dashboard_view, name="dashboard"),
-        ]
+        custom_urls = [path("", dashboard_view, name="dashboard")]
         return custom_urls + urls
 
 
