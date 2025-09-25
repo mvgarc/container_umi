@@ -3,7 +3,10 @@ from django.urls import path
 from django.template.response import TemplateResponse
 from django.db.models import Sum
 from django.utils.dateformat import DateFormat
+from django.utils.safestring import mark_safe
+import json
 from gestion.models import Container, PaymentPlan, Document, ShippingLine
+
 
 class CustomAdminSite(AdminSite):
     site_header = "Panel de Administración UMI"
@@ -14,15 +17,20 @@ class CustomAdminSite(AdminSite):
         urls = super().get_urls()
 
         def dashboard_view(request):
+            # Métricas
             total_contenedores = Container.objects.count()
-            pendientes = Container.objects.filter(status="en_transito").count() 
             en_transito = Container.objects.filter(status="en_transito").count()
             entregados = Container.objects.filter(status="entregado").count()
+
+            # Definimos "pendientes" como los que NO están entregados
+            pendientes = Container.objects.exclude(status="entregado").count()
+
             pagos_pendientes = PaymentPlan.objects.filter(paid=False).count()
             pagos_realizados = PaymentPlan.objects.filter(paid=True).count()
             documentos_obligatorios = Document.objects.filter(required=True).count()
             navieras = ShippingLine.objects.count()
 
+            # Evolución de pagos
             pagos = (
                 PaymentPlan.objects.values("due_date")
                 .order_by("due_date")
@@ -31,7 +39,11 @@ class CustomAdminSite(AdminSite):
 
             pagos_labels = [DateFormat(p["due_date"]).format("d M Y") for p in pagos]
             pagos_data = [float(p["total"]) for p in pagos]
-            
+
+            # Convertimos a JSON para Chart.js
+            pagos_labels_json = mark_safe(json.dumps(pagos_labels))
+            pagos_data_json = mark_safe(json.dumps(pagos_data))
+
             context = dict(
                 self.each_context(request),
                 title="Dashboard UMI",
@@ -43,8 +55,8 @@ class CustomAdminSite(AdminSite):
                 pagos_realizados=pagos_realizados,
                 documentos_obligatorios=documentos_obligatorios,
                 navieras=navieras,
-                pagos_labels=pagos_labels,
-                pagos_data=pagos_data,
+                pagos_labels=pagos_labels_json,
+                pagos_data=pagos_data_json,
             )
             return TemplateResponse(request, "gestion_admin/dashboard.html", context)
 
@@ -52,5 +64,6 @@ class CustomAdminSite(AdminSite):
             path("", dashboard_view, name="dashboard"),
         ]
         return custom_urls + urls
+
 
 custom_admin_site = CustomAdminSite(name="custom_admin")
