@@ -39,7 +39,7 @@ class CustomAdminSite(AdminSite):
                 expiry_date__lt=today
             ).count()
 
-            # --- Contenedores por estado ---
+            # --- Contenedores por estado (Gráfica de Tarta) ---
             estados_data_raw = (
                 Container.objects.values("status")
                 .annotate(total=Count("id"))
@@ -56,14 +56,19 @@ class CustomAdminSite(AdminSite):
             estados_labels = [status_map.get(c['status'], c['status']) for c in estados_data_raw]
             estados_data = [c['total'] for c in estados_data_raw]
 
-            # --- Evolución de pagos ---
+            # --- Evolución de pagos (Gráfica de Línea) ---
             pagos = (
-                PaymentPlan.objects.filter(paid=True).values("due_date") # Filtrar solo realizados para la evolución
+                PaymentPlan.objects.filter(paid=True).values("due_date") 
                 .order_by("due_date")
                 .annotate(total=Sum("amount"))
             )
             pagos_labels = [DateFormat(p["due_date"]).format("d M Y") for p in pagos]
             pagos_data = [float(p["total"]) for p in pagos]
+            
+            # --- Datos de barra de pagos (Pendientes/Realizados) para JSON_SCRIPT ---
+            pagos_pendientes_data = [pagos_pendientes] 
+            pagos_realizados_data = [pagos_realizados]
+
 
             # --- URLs seguras con reverse ---
             urls_acceso = {
@@ -87,11 +92,13 @@ class CustomAdminSite(AdminSite):
                 navieras=navieras,
                 documentos_proximos=documentos_proximos,
                 documentos_vencidos=documentos_vencidos,
-                # Datos para json_script (listas de Python nativas)
+                # Datos para json_script
                 estados_labels=estados_labels,
                 estados_data=estados_data,
                 pagos_labels=pagos_labels,
                 pagos_data=pagos_data,
+                pagos_pendientes_data=pagos_pendientes_data, # Lista para json_script
+                pagos_realizados_data=pagos_realizados_data, # Lista para json_script
                 **urls_acceso
             )
             return TemplateResponse(request, "gestion_admin/dashboard.html", context)
