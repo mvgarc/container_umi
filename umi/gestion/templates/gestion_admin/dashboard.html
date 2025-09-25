@@ -60,17 +60,19 @@
     
     <div style="width: 100%; margin-top: 10px; background-color: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 0 5px rgba(0,0,0,0.1);">
         <h3>Evolución de Pagos</h3>
-        <canvas id="evolucionPagosChart"></canvas>
+        <div style="height: 350px;"> 
+            <canvas id="evolucionPagosChart"></canvas>
+        </div>
     </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Opción clave para Chart.js en layouts flexibles
+        // Opciones de configuración comunes para todas las gráficas
         const commonOptions = { 
             responsive: true, 
-            maintainAspectRatio: false 
+            maintainAspectRatio: false // Desactiva la proporción automática para usar la altura del div
         };
         
         // Contenedores (pie)
@@ -103,7 +105,7 @@
                 }]
             },
             options: {
-                ...commonOptions, // Incluye responsive y maintainAspectRatio
+                ...commonOptions, 
                 scales: { y: { beginAtZero: true } }
             }
         });
@@ -124,7 +126,7 @@
                 }]
             },
             options: {
-                ...commonOptions, // Incluye responsive y maintainAspectRatio
+                ...commonOptions,
                 scales: { y: { beginAtZero: true } }
             }
         });
