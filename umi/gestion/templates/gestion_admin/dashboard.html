@@ -64,7 +64,7 @@
     </div>
 </div>
 
-<h2>📈 Gráficas</h2>
+<h2>Gráficas</h2>
 <div class="charts">
     <div class="chart-container">
         <h3>Contenedores por Estado</h3>
@@ -97,17 +97,24 @@ document.addEventListener('DOMContentLoaded', function() {
     const estadosData = JSON.parse(document.getElementById("estados-data").textContent);
     const pagosLabels = JSON.parse(document.getElementById("pagos-labels").textContent);
     const pagosData = JSON.parse(document.getElementById("pagos-data").textContent);
-    
-    // Lectura y combinación de datos de barra
+
     const pagosPendientesData = JSON.parse(document.getElementById("pagos-pendientes-data").textContent);
     const pagosRealizadosData = JSON.parse(document.getElementById("pagos-realizados-data").textContent);
-    const pagosBarData = [pagosPendientesData[0], pagosRealizadosData[0]]; // [Pendientes, Realizados]
+    const pagosBarData = [pagosPendientesData[0], pagosRealizadosData[0]];
 
+    // Cache de instancias de gráficos
+    const charts = {};
 
-    // Función factorizada para renderizar gráficos
     function renderChart(id, type, data, options={}) {
-        const ctx = document.getElementById(id).getContext('2d');
-        new Chart(ctx, {
+        const canvas = document.getElementById(id);
+        const ctx = canvas.getContext('2d');
+
+        // Destruir si ya existe un gráfico en ese canvas
+        if (charts[id]) {
+            charts[id].destroy();
+        }
+
+        charts[id] = new Chart(ctx, {
             type: type,
             data: data,
             options: { 

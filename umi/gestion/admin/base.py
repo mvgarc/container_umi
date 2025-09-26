@@ -1,4 +1,4 @@
-from django.contrib import admin
+"""from django.contrib import admin
 from gestion.models import Container, Document, PaymentPlan, ShippingLine
 from .custom_site import custom_admin_site
 
@@ -24,3 +24,4 @@ class PaymentPlanAdmin(admin.ModelAdmin):
 class ShippingLineAdmin(admin.ModelAdmin):
     list_display = ("name", "country", "contact_email")
     search_fields = ("name", "country")
+"""

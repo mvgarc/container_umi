@@ -38,19 +38,18 @@ h1 {
 .dashboard-card .card-links a {
     text-decoration: none;
     font-weight: 500;
-    color: #007bff; /* Color azul para enlaces por defecto */
+    color: #007bff;
 }
 .dashboard-card .card-links a:nth-child(2) {
-    color: #28a745; /* Color verde para el botón de Añadir */
+    color: #28a745;
 }
 
-/* Indicadores visuales */
+/* Colores de estado */
 .dashboard-card.warning p { color: #d9534f; }
 .dashboard-card.success p { color: #5cb85c; }
 .dashboard-card.alert { background: #fff3cd; color: #856404; }
 .dashboard-card.danger { background: #f8d7da; color: #721c24; }
 .dashboard-card.alert h3, .dashboard-card.danger h3 { color: inherit; }
-
 
 .charts {
     display: flex;
@@ -65,10 +64,17 @@ h1 {
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0 0 5px rgba(0,0,0,0.1);
-    height: 400px; /* Altura forzada para Chart.js */
+    height: 400px;
+    position: relative; /* clave para Chart.js */
 }
 
-/* 🚨 CORRECCIÓN: Estilo para que la gráfica de línea use todo el ancho */
+.chart-container canvas {
+    max-height: 100% !important;
+    max-width: 100% !important;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
 .chart-container.full {
     flex-basis: 100%;
     min-width: 100%;
