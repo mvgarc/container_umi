@@ -8,8 +8,20 @@
 {% block content %}
 <div id="main-dashboard-content">
 
-    <div class="dashboard-cards">
+    {% if documentos_proximos > 0 or documentos_vencidos > 0 %}
+    <div class="warning-banner">
+        {% if documentos_proximos > 0 %}
+            ⚠️ Tienes {{ documentos_proximos }} documentos próximos a vencer.
+        {% endif %}
+        {% if documentos_vencidos > 0 %}
+            ❌ Tienes {{ documentos_vencidos }} documentos vencidos.
+        {% endif %}
+    </div>
+    {% endif %}
 
+    <h1>📊 Dashboard General</h1>
+
+    <div class="dashboard-cards">
         <div class="dashboard-card">
             <h3>Total Contenedores</h3>
             <p>{{ total_contenedores }}</p>
@@ -33,7 +45,7 @@
             <p>{{ pagos_realizados }}</p>
             <div class="card-links">
                 <a href="{{ paymentplan_list }}?paid__exact=1">Ver Pagos</a>
-                <span style="color: transparent;">+ Añadir</span> 
+                <span style="color: transparent;">+ Añadir</span>
             </div>
         </div>
 
@@ -56,13 +68,17 @@
         </div>
 
         <div class="dashboard-card alert">
-            <h3>Docs. Próximos a Vencer</h3>
-            <p>{{ documentos_proximos }}</p>
+            <h3>⚠️ Docs. Próximos a Vencer</h3>
+            <p title="Documentos que vencen en los próximos 30 días">
+                {{ documentos_proximos }}
+            </p>
         </div>
 
         <div class="dashboard-card danger">
-            <h3>Documentos Vencidos</h3>
-            <p>{{ documentos_vencidos }}</p>
+            <h3>❌ Documentos Vencidos</h3>
+            <p title="Documentos cuyo vencimiento ya pasó">
+                {{ documentos_vencidos }}
+            </p>
         </div>
     </div>
 
@@ -108,19 +124,11 @@
         function renderChart(id, type, data, options={}) {
             const canvas = document.getElementById(id);
             const ctx = canvas.getContext('2d');
-
-            if (charts[id]) {
-                charts[id].destroy();
-            }
-
+            if (charts[id]) charts[id].destroy();
             charts[id] = new Chart(ctx, {
                 type: type,
                 data: data,
-                options: { 
-                    responsive: true, 
-                    maintainAspectRatio: false,
-                    ...options 
-                }
+                options: { responsive: true, maintainAspectRatio: false, ...options }
             });
         }
 
@@ -138,11 +146,11 @@
             labels: pagosLabels,
             datasets: [{ 
                 label: 'Monto de Pagos',
-                data: pagosData, 
-                borderColor: '#007bff', 
-                backgroundColor: 'rgba(0,123,255,0.2)', 
-                fill: true, 
-                tension: 0.3 
+                data: pagosData,
+                borderColor: '#007bff',
+                backgroundColor: 'rgba(0,123,255,0.2)',
+                fill: true,
+                tension: 0.3
             }]
         }, { scales: { y: { beginAtZero: true } } });
     });
