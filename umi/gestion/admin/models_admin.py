@@ -1,6 +1,6 @@
 from django.contrib import admin
 from gestion.models import ShippingLine, Container, Document, PaymentPlan
-from .site import custom_admin_site  # tu sitio personalizado
+from .custom_site import custom_admin_site
 
 @admin.register(ShippingLine, site=custom_admin_site)
 class ShippingLineAdmin(admin.ModelAdmin):
