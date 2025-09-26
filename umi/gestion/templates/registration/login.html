@@ -1,0 +1,40 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+<link rel="stylesheet" href="{% static 'gestion/css/custom_admin.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="login-container">
+    <div class="login-box">
+        <img src="{% static 'gestion/img/logo-2.png' %}" alt="UMI Logo" class="login-logo">
+        <h2>Bienvenido a UMI Admin</h2>
+        <p class="login-subtitle">Inicia sesión con tus credenciales</p>
+
+        {% if form.errors %}
+            <div class="login-error">
+                <p>⚠️ Usuario o contraseña incorrectos.</p>
+            </div>
+        {% endif %}
+
+        <form method="post" action="{% url 'admin:login' %}">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="id_username">{% trans "Usuario" %}</label>
+                <input type="text" name="username" autofocus required id="id_username">
+            </div>
+            <div class="form-group">
+                <label for="id_password">{% trans "Contraseña" %}</label>
+                <input type="password" name="password" required id="id_password">
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="login-btn">{% trans "Iniciar sesión" %}</button>
+            </div>
+
+            <input type="hidden" name="next" value="{{ next }}">
+        </form>
+    </div>
+</div>
+{% endblock %}

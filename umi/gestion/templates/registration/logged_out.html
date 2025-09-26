@@ -1,0 +1,17 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block extrastyle %}
+<link rel="stylesheet" href="{% static 'gestion/css/login.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="login-container">
+    <div class="login-box">
+        <img src="{% static 'gestion/img/logo.png' %}" alt="Logo" class="login-logo">
+        <h2>Sesión Cerrada</h2>
+        <p>Has cerrado sesión correctamente.</p>
+        <a href="{% url 'admin:login' %}" class="btn-login">Volver a Iniciar Sesión</a>
+    </div>
+</div>
+{% endblock %}

@@ -1,25 +1,25 @@
 {% extends "admin/base.html" %}
 {% load static %}
 
-{% block title %}UMI Admin{% endblock %}
-
 {% block extrastyle %}
-{{ block.super }}
-<link rel="stylesheet" href="{% static 'gestion/css/dashboard.css' %}">
+<link rel="stylesheet" href="{% static 'gestion/css/custom_admin.css' %}">
 {% endblock %}
 
 {% block branding %}
-<div id="branding">
-    <a href="{% url 'custom_admin:index' %}" class="logo-link">
-        <img src="{% static 'gestion/img/logo-2.png' %}" alt="UMI Logo" class="logo">
-    </a>
+<div class="custom-header">
+    <img src="{% static 'gestion/img/logo-2.png' %}" alt="UMI Logo" class="logo">
+    <div class="user-actions">
+        {% if request.user.is_authenticated %}
+            <span class="welcome">Hola, {{ request.user.username }}</span>
+            
+            <!-- Botón logout con POST -->
+            <form method="post" action="{% url 'admin:logout' %}" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="logout-btn">Cerrar sesión</button>
+            </form>
+        {% endif %}
+    </div>
 </div>
 {% endblock %}
 
-{% block usertools %}
-<div id="user-tools">
-    Bienvenido, <strong>{{ user.get_username }}</strong> |
-    <a href="{% url 'admin:password_change' %}">Cambiar contraseña</a> |
-    <a href="{% url 'custom_admin:logout' %}">Cerrar sesión</a>
-</div>
-{% endblock %}
+{% block nav-global %}{% endblock %}
