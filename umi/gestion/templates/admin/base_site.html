@@ -9,11 +9,10 @@
 
 {% block userlinks %}
     {% if user.is_active and user.is_staff %}
-        <strong>Hola, {{ user.get_username }}</strong> |
         <a href="{% url 'admin:password_change' %}">{% trans 'Cambiar contraseña' %}</a> |
         <form id="logout-form" method="post" action="{% url 'admin:logout' %}" style="display:inline;">
             {% csrf_token %}
-            <button type="submit" style="background:none;border:none;color:#007bff;cursor:pointer;">
+            <button type="submit" style="background:none;border:none;color:#ffffff;cursor:pointer;">
                 {% trans 'Cerrar sesión' %}
             </button>
         </form>
