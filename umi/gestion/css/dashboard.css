@@ -1,3 +1,10 @@
+body, html {
+    box-sizing: border-box;
+}
+*, *:before, *:after {
+    box-sizing: inherit;
+}
+
 h1 {
     margin-bottom: 20px;
 }
@@ -50,12 +57,12 @@ h1 {
 .dashboard-card.danger { background: #f8d7da; color: #721c24; }
 .dashboard-card.alert h3, .dashboard-card.danger h3 { color: inherit; }
 
-
 .charts {
     display: flex;
     flex-wrap: wrap;
     gap: 20px;
     width: 100%;
+    max-width: 100%;
 }
 
 .chart-container {
@@ -66,17 +73,24 @@ h1 {
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0 0 5px rgba(0,0,0,0.1);
-    height: 400px; 
+    height: 400px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
 }
 
-/* Es importante eliminar las reglas de posicionamiento absoluto del canvas */
-/* para que Chart.js pueda gestionarlo dentro del contenedor flexbox */
 .chart-container canvas {
-    /* No se añade ninguna regla aquí */
+    flex: 1;
+    width: 100% !important;
+    height: 100% !important;
 }
 
 .chart-container.full {
     flex-basis: 100%;
     min-width: 100%;
     max-width: 100%;
+}
+
+#main-dashboard-content {
+    overflow-x: hidden;
 }

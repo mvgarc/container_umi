@@ -6,149 +6,146 @@
 {% endblock %}
 
 {% block content %}
-<div class="dashboard-cards">
+<div id="main-dashboard-content">
 
-    <div class="dashboard-card">
-        <h3>Total Contenedores</h3>
-        <p>{{ total_contenedores }}</p>
-        <div class="card-links">
-            <a href="{{ container_list }}">Ver Lista</a>
-            <a href="{{ container_add }}">+ Añadir</a>
+    <div class="dashboard-cards">
+
+        <div class="dashboard-card">
+            <h3>Total Contenedores</h3>
+            <p>{{ total_contenedores }}</p>
+            <div class="card-links">
+                <a href="{{ container_list }}">Ver Lista</a>
+                <a href="{{ container_add }}">+ Añadir</a>
+            </div>
+        </div>
+
+        <div class="dashboard-card warning">
+            <h3>Pagos Pendientes</h3>
+            <p>{{ pagos_pendientes }}</p>
+            <div class="card-links">
+                <a href="{{ paymentplan_list }}?paid__exact=0">Ver Pagos</a>
+                <a href="{{ paymentplan_add }}">+ Añadir</a>
+            </div>
+        </div>
+
+        <div class="dashboard-card success">
+            <h3>Pagos Realizados</h3>
+            <p>{{ pagos_realizados }}</p>
+            <div class="card-links">
+                <a href="{{ paymentplan_list }}?paid__exact=1">Ver Pagos</a>
+                <span style="color: transparent;">+ Añadir</span> 
+            </div>
+        </div>
+
+        <div class="dashboard-card">
+            <h3>Documentos Obligatorios</h3>
+            <p>{{ documentos_obligatorios }}</p>
+            <div class="card-links">
+                <a href="{{ document_list }}">Ver Docs</a>
+                <a href="{{ document_add }}">+ Añadir</a>
+            </div>
+        </div>
+
+        <div class="dashboard-card">
+            <h3>Navieras Registradas</h3>
+            <p>{{ navieras }}</p>
+            <div class="card-links">
+                <a href="{{ shippingline_list }}">Ver Navieras</a>
+                <a href="{{ shippingline_add }}">+ Añadir</a>
+            </div>
+        </div>
+
+        <div class="dashboard-card alert">
+            <h3>Docs. Próximos a Vencer</h3>
+            <p>{{ documentos_proximos }}</p>
+        </div>
+
+        <div class="dashboard-card danger">
+            <h3>Documentos Vencidos</h3>
+            <p>{{ documentos_vencidos }}</p>
         </div>
     </div>
 
-    <div class="dashboard-card warning">
-        <h3>Pagos Pendientes</h3>
-        <p>{{ pagos_pendientes }}</p>
-        <div class="card-links">
-            <a href="{{ paymentplan_list }}?paid__exact=0">Ver Pagos</a>
-            <a href="{{ paymentplan_add }}">+ Añadir</a>
+    <h2>📈 Gráficas</h2>
+    <div class="charts">
+        <div class="chart-container">
+            <h3>Contenedores por Estado</h3>
+            <canvas id="contenedoresChart"></canvas>
+        </div>
+
+        <div class="chart-container">
+            <h3>Pagos por Tipo</h3>
+            <canvas id="pagosChart"></canvas>
+        </div>
+
+        <div class="chart-container full">
+            <h3>Evolución de Pagos</h3>
+            <canvas id="evolucionPagosChart"></canvas>
         </div>
     </div>
 
-    <div class="dashboard-card success">
-        <h3>Pagos Realizados</h3>
-        <p>{{ pagos_realizados }}</p>
-        <div class="card-links">
-            <a href="{{ paymentplan_list }}?paid__exact=1">Ver Pagos</a>
-            <span style="color: transparent;">+ Añadir</span> 
-        </div>
-    </div>
+    {{ estados_labels|json_script:"estados-labels" }}
+    {{ estados_data|json_script:"estados-data" }}
+    {{ pagos_labels|json_script:"pagos-labels" }}
+    {{ pagos_data|json_script:"pagos-data" }}
+    {{ pagos_pendientes_data|json_script:"pagos-pendientes-data" }}
+    {{ pagos_realizados_data|json_script:"pagos-realizados-data" }}
 
-    <div class="dashboard-card">
-        <h3>Documentos Obligatorios</h3>
-        <p>{{ documentos_obligatorios }}</p>
-        <div class="card-links">
-            <a href="{{ document_list }}">Ver Docs</a>
-            <a href="{{ document_add }}">+ Añadir</a>
-        </div>
-    </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const estadosLabels = JSON.parse(document.getElementById("estados-labels").textContent);
+        const estadosData = JSON.parse(document.getElementById("estados-data").textContent);
+        const pagosLabels = JSON.parse(document.getElementById("pagos-labels").textContent);
+        const pagosData = JSON.parse(document.getElementById("pagos-data").textContent);
 
-    <div class="dashboard-card">
-        <h3>Navieras Registradas</h3>
-        <p>{{ navieras }}</p>
-        <div class="card-links">
-            <a href="{{ shippingline_list }}">Ver Navieras</a>
-            <a href="{{ shippingline_add }}">+ Añadir</a>
-        </div>
-    </div>
+        const pagosPendientesData = JSON.parse(document.getElementById("pagos-pendientes-data").textContent);
+        const pagosRealizadosData = JSON.parse(document.getElementById("pagos-realizados-data").textContent);
+        const pagosBarData = [pagosPendientesData[0], pagosRealizadosData[0]];
 
-    <div class="dashboard-card alert">
-        <h3>Docs. Próximos a Vencer</h3>
-        <p>{{ documentos_proximos }}</p>
-    </div>
+        const charts = {};
 
-    <div class="dashboard-card danger">
-        <h3>Documentos Vencidos</h3>
-        <p>{{ documentos_vencidos }}</p>
-    </div>
-</div>
+        function renderChart(id, type, data, options={}) {
+            const canvas = document.getElementById(id);
+            const ctx = canvas.getContext('2d');
 
-<h2>Gráficas</h2>
-<div class="charts">
-    <div class="chart-container">
-        <h3>Contenedores por Estado</h3>
-        <canvas id="contenedoresChart"></canvas>
-    </div>
+            if (charts[id]) {
+                charts[id].destroy();
+            }
 
-    <div class="chart-container">
-        <h3>Pagos por Tipo</h3>
-        <canvas id="pagosChart"></canvas>
-    </div>
-
-    <div class="chart-container full">
-        <h3>Evolución de Pagos</h3>
-        <canvas id="evolucionPagosChart"></canvas>
-    </div>
-</div>
-
-{{ estados_labels|json_script:"estados-labels" }}
-{{ estados_data|json_script:"estados-data" }}
-{{ pagos_labels|json_script:"pagos-labels" }}
-{{ pagos_data|json_script:"pagos-data" }}
-{{ pagos_pendientes_data|json_script:"pagos-pendientes-data" }}
-{{ pagos_realizados_data|json_script:"pagos-realizados-data" }}
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Lectura segura de los datos JSON
-    const estadosLabels = JSON.parse(document.getElementById("estados-labels").textContent);
-    const estadosData = JSON.parse(document.getElementById("estados-data").textContent);
-    const pagosLabels = JSON.parse(document.getElementById("pagos-labels").textContent);
-    const pagosData = JSON.parse(document.getElementById("pagos-data").textContent);
-
-    const pagosPendientesData = JSON.parse(document.getElementById("pagos-pendientes-data").textContent);
-    const pagosRealizadosData = JSON.parse(document.getElementById("pagos-realizados-data").textContent);
-    const pagosBarData = [pagosPendientesData[0], pagosRealizadosData[0]];
-
-    // Cache de instancias de gráficos
-    const charts = {};
-
-    function renderChart(id, type, data, options={}) {
-        const canvas = document.getElementById(id);
-        const ctx = canvas.getContext('2d');
-
-        // Destruir si ya existe un gráfico en ese canvas
-        if (charts[id]) {
-            charts[id].destroy();
+            charts[id] = new Chart(ctx, {
+                type: type,
+                data: data,
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false,
+                    ...options 
+                }
+            });
         }
 
-        charts[id] = new Chart(ctx, {
-            type: type,
-            data: data,
-            options: { 
-                responsive: true, 
-                maintainAspectRatio: false,
-                ...options 
-            }
+        renderChart("contenedoresChart", "pie", {
+            labels: estadosLabels,
+            datasets: [{ data: estadosData, backgroundColor: ['#f0ad4e','#5bc0de','#0275d8','#5cb85c','#d9534f','#6c757d'] }]
         });
-    }
 
-    // 1. Contenedores (Pie)
-    renderChart("contenedoresChart", "pie", {
-        labels: estadosLabels,
-        datasets: [{ data: estadosData, backgroundColor: ['#f0ad4e','#5bc0de','#0275d8','#5cb85c','#d9534f','#6c757d'] }]
+        renderChart("pagosChart", "bar", {
+            labels: ['Pendientes', 'Realizados'],
+            datasets: [{ data: pagosBarData, backgroundColor: ['#d9534f','#5cb85c'] }]
+        }, { scales: { y: { beginAtZero: true } } });
+
+        renderChart("evolucionPagosChart", "line", {
+            labels: pagosLabels,
+            datasets: [{ 
+                label: 'Monto de Pagos',
+                data: pagosData, 
+                borderColor: '#007bff', 
+                backgroundColor: 'rgba(0,123,255,0.2)', 
+                fill: true, 
+                tension: 0.3 
+            }]
+        }, { scales: { y: { beginAtZero: true } } });
     });
-
-    // 2. Pagos (Barra)
-    renderChart("pagosChart", "bar", {
-        labels: ['Pendientes', 'Realizados'],
-        datasets: [{ data: pagosBarData, backgroundColor: ['#d9534f','#5cb85c'] }]
-    }, { scales: { y: { beginAtZero: true } } });
-
-    // 3. Evolución de Pagos (Línea)
-    renderChart("evolucionPagosChart", "line", {
-        labels: pagosLabels,
-        datasets: [{ 
-            label: 'Monto de Pagos',
-            data: pagosData, 
-            borderColor: '#007bff', 
-            backgroundColor: 'rgba(0,123,255,0.2)', 
-            fill: true, 
-            tension: 0.3 
-        }]
-    }, { scales: { y: { beginAtZero: true } } });
-});
-</script>
+    </script>
+</div>
 {% endblock %}
