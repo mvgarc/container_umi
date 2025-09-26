@@ -1,12 +1,11 @@
 import json
 from datetime import date, timedelta
 from django.contrib.admin import AdminSite
-from django.urls import path, reverse 
+from django.urls import path, reverse
 from django.template.response import TemplateResponse
 from django.db.models import Sum, Count
 from django.utils.dateformat import DateFormat
 from gestion.models import Container, PaymentPlan, Document, ShippingLine
-
 
 class CustomAdminSite(AdminSite):
     site_header = "Panel de Administración UMI"
@@ -14,7 +13,8 @@ class CustomAdminSite(AdminSite):
     index_title = "Bienvenido al Dashboard"
 
     def get_urls(self):
-        urls = super().get_urls()
+        # Guardamos las URLs originales (login, logout, password_change, etc.)
+        default_urls = super().get_urls()
 
         def dashboard_view(request):
             # --- Métricas Generales ---
@@ -58,19 +58,16 @@ class CustomAdminSite(AdminSite):
 
             # --- Evolución de pagos (Gráfica de Línea) ---
             pagos = (
-                PaymentPlan.objects.filter(paid=True).values("due_date") 
+                PaymentPlan.objects.filter(paid=True).values("due_date")
                 .order_by("due_date")
                 .annotate(total=Sum("amount"))
             )
             pagos_labels = [DateFormat(p["due_date"]).format("d M Y") for p in pagos]
             pagos_data = [float(p["total"]) for p in pagos]
-            
-            # --- Datos de barra de pagos (Pendientes/Realizados) para JSON_SCRIPT ---
-            pagos_pendientes_data = [pagos_pendientes] 
-            pagos_realizados_data = [pagos_realizados]
 
-            APP_NAME = "gestion" 
-            SITE_NAMESPACE = "custom_admin" 
+            # --- Datos de barra de pagos ---
+            pagos_pendientes_data = [pagos_pendientes]
+            pagos_realizados_data = [pagos_realizados]
 
             urls_acceso = {
                 "container_list": reverse("custom_admin:gestion_container_changelist"),
@@ -93,7 +90,6 @@ class CustomAdminSite(AdminSite):
                 navieras=navieras,
                 documentos_proximos=documentos_proximos,
                 documentos_vencidos=documentos_vencidos,
-                # Datos para json_script
                 estados_labels=estados_labels,
                 estados_data=estados_data,
                 pagos_labels=pagos_labels,
@@ -105,7 +101,7 @@ class CustomAdminSite(AdminSite):
             return TemplateResponse(request, "gestion_admin/dashboard.html", context)
 
         custom_urls = [path("", dashboard_view, name="dashboard")]
-        return custom_urls + urls
+        return custom_urls + default_urls
 
 
 custom_admin_site = CustomAdminSite(name="custom_admin")
