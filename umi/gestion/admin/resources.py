@@ -1,5 +1,6 @@
 from import_export import resources
-from .models import Container, Document, PaymentPlan, ShippingLine
+from gestion.models import Container, Document, PaymentPlan, ShippingLine
+
 
 class ContainerResource(resources.ModelResource):
     class Meta:

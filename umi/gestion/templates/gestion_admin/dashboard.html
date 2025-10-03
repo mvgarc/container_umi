@@ -11,22 +11,22 @@
     {% if documentos_proximos > 0 or documentos_vencidos > 0 %}
     <div class="warning-banner">
         {% if documentos_proximos > 0 %}
-            ⚠️ Tienes {{ documentos_proximos }} documentos próximos a vencer.
+            ⚠️ {{ documentos_proximos }} documentos próximos a vencer
         {% endif %}
         {% if documentos_vencidos > 0 %}
-            ❌ Tienes {{ documentos_vencidos }} documentos vencidos.
+            ❌ {{ documentos_vencidos }} documentos vencidos
         {% endif %}
     </div>
     {% endif %}
 
-    <h1>📊 Dashboard General</h1>
+    <h1>📊 Dashboard</h1>
 
     <div class="dashboard-cards">
         <div class="dashboard-card">
             <h3>Total Contenedores</h3>
             <p>{{ total_contenedores }}</p>
             <div class="card-links">
-                <a href="{{ container_list }}">Ver Lista</a>
+                <a href="{{ container_list }}">Ver lista</a>
                 <a href="{{ container_add }}">+ Añadir</a>
             </div>
         </div>
@@ -35,7 +35,7 @@
             <h3>Pagos Pendientes</h3>
             <p>{{ pagos_pendientes }}</p>
             <div class="card-links">
-                <a href="{{ paymentplan_list }}?paid__exact=0">Ver Pagos</a>
+                <a href="{{ paymentplan_list }}?paid__exact=0">Ver pagos</a>
                 <a href="{{ paymentplan_add }}">+ Añadir</a>
             </div>
         </div>
@@ -44,7 +44,7 @@
             <h3>Pagos Realizados</h3>
             <p>{{ pagos_realizados }}</p>
             <div class="card-links">
-                <a href="{{ paymentplan_list }}?paid__exact=1">Ver Pagos</a>
+                <a href="{{ paymentplan_list }}?paid__exact=1">Ver pagos</a>
                 <span style="color: transparent;">+ Añadir</span>
             </div>
         </div>
@@ -53,7 +53,7 @@
             <h3>Documentos Obligatorios</h3>
             <p>{{ documentos_obligatorios }}</p>
             <div class="card-links">
-                <a href="{{ document_list }}">Ver Docs</a>
+                <a href="{{ document_list }}">Ver docs</a>
                 <a href="{{ document_add }}">+ Añadir</a>
             </div>
         </div>
@@ -62,20 +62,20 @@
             <h3>Navieras Registradas</h3>
             <p>{{ navieras }}</p>
             <div class="card-links">
-                <a href="{{ shippingline_list }}">Ver Navieras</a>
+                <a href="{{ shippingline_list }}">Ver navieras</a>
                 <a href="{{ shippingline_add }}">+ Añadir</a>
             </div>
         </div>
 
         <div class="dashboard-card alert">
-            <h3>⚠️ Docs. Próximos a Vencer</h3>
+            <h3>Docs. Próximos a Vencer</h3>
             <p title="Documentos que vencen en los próximos 30 días">
                 {{ documentos_proximos }}
             </p>
         </div>
 
         <div class="dashboard-card danger">
-            <h3>❌ Documentos Vencidos</h3>
+            <h3>Docs. Vencidos</h3>
             <p title="Documentos cuyo vencimiento ya pasó">
                 {{ documentos_vencidos }}
             </p>
@@ -90,7 +90,7 @@
         </div>
 
         <div class="chart-container">
-            <h3>Pagos por Tipo</h3>
+            <h3>Pagos</h3>
             <canvas id="pagosChart"></canvas>
         </div>
 
@@ -122,8 +122,7 @@
         const charts = {};
 
         function renderChart(id, type, data, options={}) {
-            const canvas = document.getElementById(id);
-            const ctx = canvas.getContext('2d');
+            const ctx = document.getElementById(id).getContext('2d');
             if (charts[id]) charts[id].destroy();
             charts[id] = new Chart(ctx, {
                 type: type,
@@ -134,12 +133,12 @@
 
         renderChart("contenedoresChart", "pie", {
             labels: estadosLabels,
-            datasets: [{ data: estadosData, backgroundColor: ['#f0ad4e','#5bc0de','#0275d8','#5cb85c','#d9534f','#6c757d'] }]
+            datasets: [{ data: estadosData, backgroundColor: ['#f39c12','#3498db','#2980b9','#2ecc71','#e74c3c','#95a5a6'] }]
         });
 
         renderChart("pagosChart", "bar", {
             labels: ['Pendientes', 'Realizados'],
-            datasets: [{ data: pagosBarData, backgroundColor: ['#d9534f','#5cb85c'] }]
+            datasets: [{ data: pagosBarData, backgroundColor: ['#e67e22','#2ecc71'] }]
         }, { scales: { y: { beginAtZero: true } } });
 
         renderChart("evolucionPagosChart", "line", {
@@ -147,8 +146,8 @@
             datasets: [{ 
                 label: 'Monto de Pagos',
                 data: pagosData,
-                borderColor: '#007bff',
-                backgroundColor: 'rgba(0,123,255,0.2)',
+                borderColor: '#2980b9',
+                backgroundColor: 'rgba(41,128,185,0.2)',
                 fill: true,
                 tension: 0.3
             }]

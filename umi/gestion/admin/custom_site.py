@@ -7,13 +7,13 @@ from django.db.models import Sum, Count
 from django.utils.dateformat import DateFormat
 from gestion.models import Container, PaymentPlan, Document, ShippingLine
 
+
 class CustomAdminSite(AdminSite):
     site_header = "Panel de Administración UMI"
     site_title = "UMI Admin"
     index_title = "Bienvenido al Dashboard"
 
     def get_urls(self):
-        # Guardamos las URLs originales (login, logout, password_change, etc.)
         default_urls = super().get_urls()
 
         def dashboard_view(request):
@@ -39,7 +39,7 @@ class CustomAdminSite(AdminSite):
                 expiry_date__lt=today
             ).count()
 
-            # --- Contenedores por estado (Gráfica de Tarta) ---
+            # --- Contenedores por estado ---
             estados_data_raw = (
                 Container.objects.values("status")
                 .annotate(total=Count("id"))
@@ -56,7 +56,7 @@ class CustomAdminSite(AdminSite):
             estados_labels = [status_map.get(c['status'], c['status']) for c in estados_data_raw]
             estados_data = [c['total'] for c in estados_data_raw]
 
-            # --- Evolución de pagos (Gráfica de Línea) ---
+            # --- Evolución de pagos ---
             pagos = (
                 PaymentPlan.objects.filter(paid=True).values("due_date")
                 .order_by("due_date")
@@ -65,19 +65,20 @@ class CustomAdminSite(AdminSite):
             pagos_labels = [DateFormat(p["due_date"]).format("d M Y") for p in pagos]
             pagos_data = [float(p["total"]) for p in pagos]
 
-            # --- Datos de barra de pagos ---
+            # --- Datos de barra ---
             pagos_pendientes_data = [pagos_pendientes]
             pagos_realizados_data = [pagos_realizados]
 
+            # Generar URLs dinámicamente
             urls_acceso = {
-                "container_list": reverse("custom_admin:gestion_container_changelist"),
-                "container_add": reverse("custom_admin:gestion_container_add"),
-                "document_list": reverse("custom_admin:gestion_document_changelist"),
-                "document_add": reverse("custom_admin:gestion_document_add"),
-                "shippingline_list": reverse("custom_admin:gestion_shippingline_changelist"),
-                "shippingline_add": reverse("custom_admin:gestion_shippingline_add"),
-                "paymentplan_list": reverse("custom_admin:gestion_paymentplan_changelist"),
-                "paymentplan_add": reverse("custom_admin:gestion_paymentplan_add"),
+                "container_list": reverse(f"custom_admin:{Container._meta.app_label}_{Container._meta.model_name}_changelist"),
+                "container_add": reverse(f"custom_admin:{Container._meta.app_label}_{Container._meta.model_name}_add"),
+                "document_list": reverse(f"custom_admin:{Document._meta.app_label}_{Document._meta.model_name}_changelist"),
+                "document_add": reverse(f"custom_admin:{Document._meta.app_label}_{Document._meta.model_name}_add"),
+                "shippingline_list": reverse(f"custom_admin:{ShippingLine._meta.app_label}_{ShippingLine._meta.model_name}_changelist"),
+                "shippingline_add": reverse(f"custom_admin:{ShippingLine._meta.app_label}_{ShippingLine._meta.model_name}_add"),
+                "paymentplan_list": reverse(f"custom_admin:{PaymentPlan._meta.app_label}_{PaymentPlan._meta.model_name}_changelist"),
+                "paymentplan_add": reverse(f"custom_admin:{PaymentPlan._meta.app_label}_{PaymentPlan._meta.model_name}_add"),
             }
 
             context = dict(

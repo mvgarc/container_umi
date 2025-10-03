@@ -5,7 +5,7 @@ from .resources import (
     ContainerResource, DocumentResource,
     PaymentPlanResource, ShippingLineResource
 )
-from .site import custom_admin_site  # tu sitio personalizado
+from .custom_site import custom_admin_site
 
 @admin.register(ShippingLine, site=custom_admin_site)
 class ShippingLineAdmin(ImportExportModelAdmin):
