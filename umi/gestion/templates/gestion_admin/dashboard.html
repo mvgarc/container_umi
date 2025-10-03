@@ -19,14 +19,13 @@
     </div>
     {% endif %}
 
-    <h1>📊 Dashboard</h1>
-
     <div class="dashboard-cards">
+
         <div class="dashboard-card">
             <h3>Total Contenedores</h3>
             <p>{{ total_contenedores }}</p>
             <div class="card-links">
-                <a href="{{ container_list }}">Ver lista</a>
+                <a href="{{ container_list }}">Ver Lista</a>
                 <a href="{{ container_add }}">+ Añadir</a>
             </div>
         </div>
@@ -35,7 +34,7 @@
             <h3>Pagos Pendientes</h3>
             <p>{{ pagos_pendientes }}</p>
             <div class="card-links">
-                <a href="{{ paymentplan_list }}?paid__exact=0">Ver pagos</a>
+                <a href="{{ paymentplan_list }}?paid__exact=0">Ver Pagos</a>
                 <a href="{{ paymentplan_add }}">+ Añadir</a>
             </div>
         </div>
@@ -44,7 +43,7 @@
             <h3>Pagos Realizados</h3>
             <p>{{ pagos_realizados }}</p>
             <div class="card-links">
-                <a href="{{ paymentplan_list }}?paid__exact=1">Ver pagos</a>
+                <a href="{{ paymentplan_list }}?paid__exact=1">Ver Pagos</a>
                 <span style="color: transparent;">+ Añadir</span>
             </div>
         </div>
@@ -53,7 +52,7 @@
             <h3>Documentos Obligatorios</h3>
             <p>{{ documentos_obligatorios }}</p>
             <div class="card-links">
-                <a href="{{ document_list }}">Ver docs</a>
+                <a href="{{ document_list }}">Ver Docs</a>
                 <a href="{{ document_add }}">+ Añadir</a>
             </div>
         </div>
@@ -62,27 +61,19 @@
             <h3>Navieras Registradas</h3>
             <p>{{ navieras }}</p>
             <div class="card-links">
-                <a href="{{ shippingline_list }}">Ver navieras</a>
+                <a href="{{ shippingline_list }}">Ver Navieras</a>
                 <a href="{{ shippingline_add }}">+ Añadir</a>
             </div>
         </div>
 
-        <div class="dashboard-card alert">
-            <h3>Docs. Próximos a Vencer</h3>
-            <p title="Documentos que vencen en los próximos 30 días">
-                {{ documentos_proximos }}
-            </p>
-        </div>
-
         <div class="dashboard-card danger">
-            <h3>Docs. Vencidos</h3>
+            <h3>Documentos Vencidos</h3>
             <p title="Documentos cuyo vencimiento ya pasó">
                 {{ documentos_vencidos }}
             </p>
         </div>
-    </div>
     
-    <h2>📈 Gráficas</h2>
+    <h2>Gráficas</h2>
     <div class="charts">
         <div class="chart-container">
             <h3>Contenedores por Estado</h3>
