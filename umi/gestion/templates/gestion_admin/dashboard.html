@@ -9,7 +9,7 @@
 <div id="main-dashboard-content">
 
     {% if documentos_proximos > 0 or documentos_vencidos > 0 %}
-    <div class="warning-banner">
+    <div class="warning-banner floating-alert">
         {% if documentos_proximos > 0 %}
             ⚠️ {{ documentos_proximos }} documentos próximos a vencer
         {% endif %}
@@ -20,58 +20,35 @@
     {% endif %}
 
     <div class="dashboard-cards">
-
-        <div class="dashboard-card">
-            <h3>Total Contenedores</h3>
-            <p>{{ total_contenedores }}</p>
-            <div class="card-links">
-                <a href="{{ container_list }}">Ver Lista</a>
-                <a href="{{ container_add }}">+ Añadir</a>
-            </div>
+        
+    <div class="dashboard-card">
+        <h3>Total Contenedores</h3>
+        <p>{{ total_contenedores }}</p>
+        <div class="card-links">
+            <a href="{{ container_list }}">Ver Lista</a>
+            <a href="{{ container_add }}">+ Añadir</a>
         </div>
+    </div>
 
-        <div class="dashboard-card warning">
-            <h3>Pagos Pendientes</h3>
-            <p>{{ pagos_pendientes }}</p>
-            <div class="card-links">
-                <a href="{{ paymentplan_list }}?paid__exact=0">Ver Pagos</a>
-                <a href="{{ paymentplan_add }}">+ Añadir</a>
-            </div>
+    <div class="dashboard-card warning">
+        <h3>Pagos Pendientes</h3>
+        <p>{{ pagos_pendientes }}</p>
+        <div class="card-links">
+            <a href="{{ paymentplan_list }}?paid__exact=0">Ver Pagos</a>
+            <a href="{{ paymentplan_add }}">+ Añadir</a>
         </div>
+    </div>
 
-        <div class="dashboard-card success">
-            <h3>Pagos Realizados</h3>
-            <p>{{ pagos_realizados }}</p>
-            <div class="card-links">
-                <a href="{{ paymentplan_list }}?paid__exact=1">Ver Pagos</a>
-                <span style="color: transparent;">+ Añadir</span>
-            </div>
+    <div class="dashboard-card success">
+        <h3>Pagos Realizados</h3>
+        <p>{{ pagos_realizados }}</p>
+        <div class="card-links">
+            <a href="{{ paymentplan_list }}?paid__exact=1">Ver Pagos</a>
+            <span style="color: transparent;">+ Añadir</span>
         </div>
+    </div>
 
-        <div class="dashboard-card">
-            <h3>Documentos Obligatorios</h3>
-            <p>{{ documentos_obligatorios }}</p>
-            <div class="card-links">
-                <a href="{{ document_list }}">Ver Docs</a>
-                <a href="{{ document_add }}">+ Añadir</a>
-            </div>
-        </div>
-
-        <div class="dashboard-card">
-            <h3>Navieras Registradas</h3>
-            <p>{{ navieras }}</p>
-            <div class="card-links">
-                <a href="{{ shippingline_list }}">Ver Navieras</a>
-                <a href="{{ shippingline_add }}">+ Añadir</a>
-            </div>
-        </div>
-
-        <div class="dashboard-card danger">
-            <h3>Documentos Vencidos</h3>
-            <p title="Documentos cuyo vencimiento ya pasó">
-                {{ documentos_vencidos }}
-            </p>
-        </div>
+</div>
     
     <h2>Gráficas</h2>
     <div class="charts">
@@ -79,7 +56,7 @@
             <h3>Contenedores por Estado</h3>
             <canvas id="contenedoresChart"></canvas>
         </div>
-
+        
         <div class="chart-container">
             <h3>Pagos</h3>
             <canvas id="pagosChart"></canvas>
