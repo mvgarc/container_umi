@@ -1,118 +1,69 @@
-from django.contrib import admin
-from import_export.admin import ImportExportModelAdmin
-from gestion.models import (
-    ShippingLine, Port, CustomsAgent, Product,
-    BillOfLading, Container, Document,
-    PaymentCategory, PaymentPlan, Supplier
-)
-from .site import custom_admin_site
+from datetime import date, timedelta
+from django.contrib.admin import AdminSite
+from django.urls import path, reverse
+from django.template.response import TemplateResponse
+from gestion.models import Container, PaymentPlan, Document, ShippingLine
 
 
-# ----------------------------
-# NAVIERAS (Shipping Lines)
-# ----------------------------
-@admin.register(ShippingLine, site=custom_admin_site)
-class ShippingLineAdmin(ImportExportModelAdmin):
-    list_display = ('name',)
-    search_fields = ('name',)
-    ordering = ('name',)
+class CustomAdminSite(AdminSite):
+    site_header = "Panel de Administración UMI"
+    site_title = "UMI Admin"
+    index_title = "Bienvenido al Dashboard"
+
+    def get_urls(self):
+        default_urls = super().get_urls()
+
+        def dashboard_view(request):
+            # --- MÉTRICAS GENERALES ---
+            total_contenedores = Container.objects.count()
+            navieras = ShippingLine.objects.count()
+
+            # --- ESTADO DE PAGOS ---
+            pagos_pendientes = PaymentPlan.objects.filter(status="pendiente").count()
+            pagos_abonados = PaymentPlan.objects.filter(status="abonado").count()
+            pagos_realizados = PaymentPlan.objects.filter(status="pagado").count()
+
+            # --- DOCUMENTOS PRÓXIMOS A VENCER Y VENCIDOS ---
+            today = date.today()
+            upcoming_deadline = today + timedelta(days=30)
+
+            documentos_proximos = Document.objects.filter(
+                expiry_date__isnull=False,
+                expiry_date__lte=upcoming_deadline,
+                expiry_date__gte=today
+            ).count()
+
+            documentos_vencidos = Document.objects.filter(
+                expiry_date__isnull=False,
+                expiry_date__lt=today
+            ).count()
+
+            # --- URLs DINÁMICAS PARA ENLACES ---
+            urls_acceso = {
+                "container_list": reverse(f"custom_admin:{Container._meta.app_label}_{Container._meta.model_name}_changelist"),
+                "container_add": reverse(f"custom_admin:{Container._meta.app_label}_{Container._meta.model_name}_add"),
+                "paymentplan_list": reverse(f"custom_admin:{PaymentPlan._meta.app_label}_{PaymentPlan._meta.model_name}_changelist"),
+                "paymentplan_add": reverse(f"custom_admin:{PaymentPlan._meta.app_label}_{PaymentPlan._meta.model_name}_add"),
+            }
+
+            # --- CONTEXTO PARA EL TEMPLATE ---
+            context = dict(
+                self.each_context(request),
+                title="Dashboard UMI",
+                total_contenedores=total_contenedores,
+                pagos_pendientes=pagos_pendientes,
+                pagos_abonados=pagos_abonados,
+                pagos_realizados=pagos_realizados,
+                documentos_proximos=documentos_proximos,
+                documentos_vencidos=documentos_vencidos,
+                navieras=navieras,
+                **urls_acceso
+            )
+
+            return TemplateResponse(request, "admin/dashboard.html", context)
+
+        custom_urls = [path("", dashboard_view, name="dashboard")]
+        return custom_urls + default_urls
 
 
-# ----------------------------
-# PUERTOS
-# ----------------------------
-@admin.register(Port, site=custom_admin_site)
-class PortAdmin(ImportExportModelAdmin):
-    list_display = ('name', 'country')
-    search_fields = ('name', 'country')
-    ordering = ('name',)
-
-
-# ----------------------------
-# AGENTES ADUANALES
-# ----------------------------
-@admin.register(CustomsAgent, site=custom_admin_site)
-class CustomsAgentAdmin(ImportExportModelAdmin):
-    list_display = ('name', 'phone', 'email')
-    search_fields = ('name', 'email')
-    ordering = ('name',)
-
-
-# ----------------------------
-# PRODUCTOS
-# ----------------------------
-@admin.register(Product, site=custom_admin_site)
-class ProductAdmin(ImportExportModelAdmin):
-    list_display = ('code', 'description', 'tariff_code')
-    search_fields = ('code', 'description', 'tariff_code')
-    ordering = ('code',)
-
-
-# ----------------------------
-# BILL OF LADING (BL)
-# ----------------------------
-@admin.register(BillOfLading, site=custom_admin_site)
-class BillOfLadingAdmin(ImportExportModelAdmin):
-    list_display = (
-        'numero_bl', 'invoice_number', 'shipping_line',
-        'status', 'etd', 'eta', 'investment'
-    )
-    list_filter = ('status', 'shipping_line', 'customs_agent', 'port')
-    search_fields = ('numero_bl', 'invoice_number')
-    ordering = ('-etd',)
-
-
-# ----------------------------
-# CONTENEDORES
-# ----------------------------
-@admin.register(Container, site=custom_admin_site)
-class ContainerAdmin(ImportExportModelAdmin):
-    list_display = ('container_number', 'bill_of_lading')
-    search_fields = ('container_number', 'bill_of_lading__numero_bl')
-    ordering = ('container_number',)
-
-
-# ----------------------------
-# DOCUMENTOS
-# ----------------------------
-@admin.register(Document, site=custom_admin_site)
-class DocumentAdmin(ImportExportModelAdmin):
-    list_display = ('name', 'bill_of_lading', 'expiry_date', 'is_sencamer', 'is_rl9')
-    list_filter = ('is_sencamer', 'is_rl9')
-    search_fields = ('name', 'bill_of_lading__numero_bl')
-    ordering = ('name',)
-
-
-# ----------------------------
-# CATEGORÍAS DE PAGO
-# ----------------------------
-@admin.register(PaymentCategory, site=custom_admin_site)
-class PaymentCategoryAdmin(ImportExportModelAdmin):
-    list_display = ('name',)
-    search_fields = ('name',)
-    ordering = ('name',)
-
-
-# ----------------------------
-# PLAN DE PAGO
-# ----------------------------
-@admin.register(PaymentPlan, site=custom_admin_site)
-class PaymentPlanAdmin(ImportExportModelAdmin):
-    list_display = (
-        'bill_of_lading', 'invoice_number', 'invoice_date',
-        'category', 'provider', 'shipping_line',
-        'pi_number', 'status', 'amount'
-    )
-    list_filter = ('status', 'category', 'shipping_line')
-    search_fields = ('bill_of_lading__numero_bl', 'invoice_number', 'provider')
-    ordering = ('-invoice_date',)
-
-
-# ----------------------------
-# PROVEEDORES
-# ----------------------------
-@admin.register(Supplier, site=custom_admin_site)
-class SupplierAdmin(ImportExportModelAdmin):
-    list_display = ('name', 'contact_person')
-    search_fields = ('name', 'contact_person')
-    ordering = ('name',)
+custom_admin_site = CustomAdminSite(name="custom_admin")
