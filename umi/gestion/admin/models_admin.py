@@ -40,11 +40,12 @@ class CustomAdminSite(AdminSite):
 
             # --- URLs DINÁMICAS PARA ENLACES ---
             urls_acceso = {
-                "container_list": reverse(f"custom_admin:{Container._meta.app_label}_{Container._meta.model_name}_changelist"),
-                "container_add": reverse(f"custom_admin:{Container._meta.app_label}_{Container._meta.model_name}_add"),
-                "paymentplan_list": reverse(f"custom_admin:{PaymentPlan._meta.app_label}_{PaymentPlan._meta.model_name}_changelist"),
-                "paymentplan_add": reverse(f"custom_admin:{PaymentPlan._meta.app_label}_{PaymentPlan._meta.model_name}_add"),
+                "container_list": reverse("custom_admin:gestion_container_changelist"),
+                "container_add": reverse("custom_admin:gestion_container_add"),
+                "paymentplan_list": reverse("custom_admin:gestion_paymentplan_changelist"),
+                "paymentplan_add": reverse("custom_admin:gestion_paymentplan_add"),
             }
+
 
             # --- CONTEXTO PARA EL TEMPLATE ---
             context = dict(

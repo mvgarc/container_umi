@@ -16,9 +16,8 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from gestion.admin.custom_site import custom_admin_site
+from gestion.admin.models_admin import custom_admin_site
 
 urlpatterns = [
     path("admin/", custom_admin_site.urls),
-    path("", include("gestion.urls")),
 ]
