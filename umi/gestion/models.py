@@ -1,67 +1,127 @@
 from django.db import models
-
+from django.utils import timezone
 class ShippingLine(models.Model):
-    name = models.CharField(max_length=100, unique=True, verbose_name="Nombre de la naviera")
-    country = models.CharField(max_length=100, blank=True, null=True, verbose_name="País de origen")
-    contact_email = models.EmailField(blank=True, null=True, verbose_name="Correo de contacto")
-    phone = models.CharField(max_length=20, blank=True, null=True, verbose_name="Teléfono")
-    website = models.URLField(blank=True, null=True, verbose_name="Sitio web")
-
-    class Meta:
-        verbose_name = "Naviera"
-        verbose_name_plural = "Navieras"
-        ordering = ["name"]
+    name = models.CharField(max_length=100)
+    contact_emails = models.JSONField(default=list, blank=True)  # permite varios correos
+    phone_numbers = models.JSONField(default=list, blank=True)   # permite varios teléfonos
 
     def __str__(self):
         return self.name
 
 
-class Container(models.Model):
-    STATUS_CHOICES = [
-        ("en_transito", "En tránsito"),
-        ("en_puerto", "En puerto"),
-        ("en_aduana", "En aduana"),
-        ("entregado", "Entregado"),
-        ("devuelto", "Devuelto"),
-        ("retrasado", "Retrasado"),
-    ]
-
-    container_number = models.CharField(max_length=11, unique=True, verbose_name="Número de contenedor")
-    shipping_line = models.ForeignKey(ShippingLine, on_delete=models.CASCADE, related_name="containers", verbose_name="Naviera")
-    origin = models.CharField(max_length=100, verbose_name="Origen")
-    eta = models.DateField(verbose_name="Fecha estimada de arribo (ETA)")
-    price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Precio")
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, verbose_name="Estado")
-    documentation = models.FileField(upload_to="documents/", blank=True, null=True, verbose_name="Documentación")
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        ordering = ["-created_at"]
-        verbose_name = "Contenedor"
-        verbose_name_plural = "Contenedores"
+class Port(models.Model):
+    name = models.CharField(max_length=100)
+    country = models.CharField(max_length=100, blank=True, null=True)
 
     def __str__(self):
-        return f"{self.container_number} - {self.status}"
+        return self.name
+
+
+class CustomsAgent(models.Model):
+    name = models.CharField(max_length=100)
+    phone = models.CharField(max_length=50, blank=True, null=True)
+    email = models.EmailField(blank=True, null=True)
+
+    def __str__(self):
+        return self.name
+
+
+class Product(models.Model):
+    code = models.CharField(max_length=50, verbose_name="Código / Modelo")
+    description = models.TextField(verbose_name="Descripción del Producto")
+    characteristics = models.JSONField(default=dict, blank=True)  # Ejemplo: {"color": "rojo", "dimensiones": "20x10"}
+    tariff_code = models.CharField(max_length=10, verbose_name="Código Arancelario")
+
+    def __str__(self):
+        return f"{self.code} - {self.description[:30]}"
+
+
+class BillOfLading(models.Model):
+    STATUS_CHOICES = [
+        ('transito', 'En Tránsito'),
+        ('puerto', 'En Puerto'),
+        ('aduana', 'En Aduana'),
+        ('entregado', 'Entregado'),
+        ('devuelto', 'Devuelto'),
+        ('retrasado', 'Retrasado'),
+        ('cancelado', 'Cancelado'),
+    ]
+
+    numero_bl = models.CharField(max_length=50, unique=True, verbose_name="Número de BL")
+    invoice_number = models.CharField(max_length=50, verbose_name="Número de Factura")
+    shipping_line = models.ForeignKey(ShippingLine, on_delete=models.SET_NULL, null=True, blank=True)
+    etd = models.DateField(verbose_name="Fecha ETD")
+    free_days = models.PositiveIntegerField(default=7)
+    eta = models.DateField(verbose_name="Fecha ETA")
+    additional_info = models.TextField(blank=True, null=True, verbose_name="Información Adicional")
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='transito')
+    investment = models.DecimalField(max_digits=12, decimal_places=2, verbose_name="Inversión / Flete")
+    customs_agent = models.ForeignKey(CustomsAgent, on_delete=models.SET_NULL, null=True, blank=True)
+    port = models.ForeignKey(Port, on_delete=models.SET_NULL, null=True, blank=True)
+
+    def __str__(self):
+        return f"BL {self.numero_bl}"
+
+
+class Container(models.Model):
+    bill_of_lading = models.ForeignKey(BillOfLading, on_delete=models.CASCADE, related_name="containers")
+    container_number = models.CharField(max_length=50)
+    products = models.ManyToManyField(Product, blank=True)
+
+    def __str__(self):
+        return self.container_number
 
 
 class Document(models.Model):
-    container = models.ForeignKey(Container, on_delete=models.CASCADE, related_name="documents")
-    name = models.CharField(max_length=100, verbose_name="Nombre del documento")
+    bill_of_lading = models.ForeignKey(BillOfLading, on_delete=models.CASCADE, related_name="documents")
+    name = models.CharField(max_length=100)
     file = models.FileField(upload_to="documents/")
-    required = models.BooleanField(default=True, verbose_name="Es obligatorio")
-    uploaded_at = models.DateTimeField(auto_now_add=True)
-    expiry_date = models.DateField(blank=True, null=True, verbose_name="Fecha de vencimiento") 
+    expiry_date = models.DateField(blank=True, null=True, verbose_name="Fecha de Vencimiento")
+    is_sencamer = models.BooleanField(default=False)
+    is_rl9 = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"{self.name} ({'Obligatorio' if self.required else 'Opcional'})"
+        return self.name
+
+
+class PaymentCategory(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+
+    def __str__(self):
+        return self.name
 
 
 class PaymentPlan(models.Model):
-    container = models.ForeignKey(Container, on_delete=models.CASCADE, related_name="payments")
-    due_date = models.DateField(verbose_name="Fecha de pago")
-    amount = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Monto")
-    paid = models.BooleanField(default=False, verbose_name="Pagado")
-    notes = models.TextField(blank=True, verbose_name="Observaciones")
+    STATUS_CHOICES = [
+        ('pagado', 'Pagado'),
+        ('pendiente', 'Pendiente'),
+        ('abonado', 'Abonado'),
+    ]
+
+    bill_of_lading = models.ForeignKey(BillOfLading, on_delete=models.CASCADE, related_name="payments")
+    invoice_number = models.CharField(max_length=50)
+    invoice_date = models.DateField(verbose_name="Fecha de Factura")
+    category = models.ForeignKey(PaymentCategory, on_delete=models.SET_NULL, null=True, blank=True)
+    provider = models.CharField(max_length=100)
+    shipping_line = models.ForeignKey(ShippingLine, on_delete=models.SET_NULL, null=True, blank=True)
+    pi_number = models.CharField(max_length=50, verbose_name="Número de Producto / PI")
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="pendiente")
+    amount = models.DecimalField(max_digits=12, decimal_places=2)
 
     def __str__(self):
-        return f"Pago {self.amount} - {self.due_date} ({'Pagado' if self.paid else 'Pendiente'})"
+        return f"{self.bill_of_lading} - {self.invoice_number}"
+
+class Supplier(models.Model):
+    name = models.CharField(max_length=100, verbose_name="Nombre del proveedor")
+    address = models.TextField(blank=True, null=True, verbose_name="Dirección")
+    phone_numbers = models.JSONField(default=list, blank=True, verbose_name="Teléfonos")
+    emails = models.JSONField(default=list, blank=True, verbose_name="Correos")
+    contact_person = models.CharField(max_length=100, blank=True, null=True, verbose_name="Persona de contacto")
+
+    class Meta:
+        verbose_name = "Proveedor"
+        verbose_name_plural = "Proveedores"
+        ordering = ["name"]
+
+    def __str__(self):
+        return self.name
