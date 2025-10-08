@@ -1,6 +1,6 @@
 from django.contrib import admin
-from gestion.admin.models_admin import custom_admin_site
 from gestion.models import ShippingLine, Container, PaymentPlan, Document
+from gestion.admin.custom_admin import custom_admin_site
 
 
 @custom_admin_site.register(ShippingLine)
