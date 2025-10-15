@@ -11,13 +11,16 @@ from gestion.models import (
     BillOfLading,
     PaymentCategory,
     Supplier,
+    Product,
+    Port,
+    CustomsAgent,
 )
 
 
 class CustomAdminSite(AdminSite):
-    site_header = "Panel de Administración UMI"
+    site_header = "UMI Administration"
     site_title = "UMI Admin"
-    index_title = "Bienvenido al Dashboard"
+    index_title = "Welcome to UMI Dashboard"
 
     def get_urls(self):
         urls = super().get_urls()
@@ -26,17 +29,17 @@ class CustomAdminSite(AdminSite):
             today = date.today()
             upcoming_deadline = today + timedelta(days=30)
 
-            # Métricas principales
+            # Metrics
             total_contenedores = Container.objects.count()
             total_navieras = ShippingLine.objects.count()
             total_facturas = PaymentPlan.objects.count()
 
-            # Pagos
-            pagos_pendientes = PaymentPlan.objects.filter(status="pendiente").count()
-            pagos_abonados = PaymentPlan.objects.filter(status="abonado").count()
-            pagos_pagados = PaymentPlan.objects.filter(status="pagado").count()
+            # Payments
+            pagos_pendientes = PaymentPlan.objects.filter(status="pending").count()
+            pagos_abonados = PaymentPlan.objects.filter(status="partial").count()
+            pagos_pagados = PaymentPlan.objects.filter(status="paid").count()
 
-            # Documentos
+            # Documents
             documentos_proximos = Document.objects.filter(
                 expiry_date__isnull=False,
                 expiry_date__lte=upcoming_deadline,
@@ -48,7 +51,7 @@ class CustomAdminSite(AdminSite):
                 expiry_date__lt=today
             ).count()
 
-            # URLs dinámicas
+            # Dynamic URLs
             urls_acceso = {
                 "container_list": reverse("custom_admin:gestion_container_changelist"),
                 "container_add": reverse("custom_admin:gestion_container_add"),
@@ -80,12 +83,27 @@ class CustomAdminSite(AdminSite):
 
 custom_admin_site = CustomAdminSite(name="custom_admin")
 
-# ========== MODELOS REGISTRADOS ==========
 
-@admin.register(ShippingLine, site=custom_admin_site)
-class ShippingLineAdmin(admin.ModelAdmin):
-    list_display = ("name",)
-    search_fields = ("name",)
+# ========== INLINES ==========
+
+class ContainerInline(admin.TabularInline):
+    model = Container
+    extra = 1
+
+
+class DocumentInline(admin.TabularInline):
+    model = Document
+    extra = 1
+
+
+# ========== ADMIN MODELS ==========
+
+@admin.register(BillOfLading, site=custom_admin_site)
+class BillOfLadingAdmin(admin.ModelAdmin):
+    list_display = ("number_bl", "invoice_number", "status", "eta", "shipping_line")
+    list_filter = ("status", "shipping_line", "port")
+    search_fields = ("number_bl", "invoice_number")
+    inlines = [ContainerInline, DocumentInline]
 
 
 @admin.register(Container, site=custom_admin_site)
@@ -95,6 +113,13 @@ class ContainerAdmin(admin.ModelAdmin):
     list_filter = ("bill_of_lading__status",)
 
 
+@admin.register(Document, site=custom_admin_site)
+class DocumentAdmin(admin.ModelAdmin):
+    list_display = ("name", "expiry_date", "bill_of_lading", "is_sencamer", "is_rl9")
+    list_filter = ("is_sencamer", "is_rl9")
+    search_fields = ("name",)
+
+
 @admin.register(PaymentPlan, site=custom_admin_site)
 class PaymentPlanAdmin(admin.ModelAdmin):
     list_display = ("invoice_number", "status", "amount", "provider")
@@ -102,18 +127,10 @@ class PaymentPlanAdmin(admin.ModelAdmin):
     search_fields = ("invoice_number", "provider")
 
 
-@admin.register(Document, site=custom_admin_site)
-class DocumentAdmin(admin.ModelAdmin):
-    list_display = ("name", "expiry_date", "bill_of_lading")
-    list_filter = ("is_sencamer", "is_rl9")
+@admin.register(ShippingLine, site=custom_admin_site)
+class ShippingLineAdmin(admin.ModelAdmin):
+    list_display = ("name",)
     search_fields = ("name",)
-
-
-@admin.register(BillOfLading, site=custom_admin_site)
-class BillOfLadingAdmin(admin.ModelAdmin):
-    list_display = ("numero_bl", "invoice_number", "status", "eta", "shipping_line")
-    list_filter = ("status", "shipping_line")
-    search_fields = ("numero_bl", "invoice_number")
 
 
 @admin.register(PaymentCategory, site=custom_admin_site)
@@ -126,3 +143,21 @@ class PaymentCategoryAdmin(admin.ModelAdmin):
 class SupplierAdmin(admin.ModelAdmin):
     list_display = ("name", "contact_person")
     search_fields = ("name", "contact_person")
+
+
+@admin.register(Product, site=custom_admin_site)
+class ProductAdmin(admin.ModelAdmin):
+    list_display = ("code", "description", "tariff_code")
+    search_fields = ("code", "description")
+
+
+@admin.register(Port, site=custom_admin_site)
+class PortAdmin(admin.ModelAdmin):
+    list_display = ("name", "country")
+    search_fields = ("name", "country")
+
+
+@admin.register(CustomsAgent, site=custom_admin_site)
+class CustomsAgentAdmin(admin.ModelAdmin):
+    list_display = ("name", "phone", "email")
+    search_fields = ("name", "email")
