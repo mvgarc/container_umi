@@ -84,8 +84,6 @@ class CustomAdminSite(AdminSite):
 custom_admin_site = CustomAdminSite(name="custom_admin")
 
 
-# ========== INLINES ==========
-
 class ContainerInline(admin.TabularInline):
     model = Container
     extra = 1
@@ -96,15 +94,34 @@ class DocumentInline(admin.TabularInline):
     extra = 1
 
 
-# ========== ADMIN MODELS ==========
-
 @admin.register(BillOfLading, site=custom_admin_site)
 class BillOfLadingAdmin(admin.ModelAdmin):
-    list_display = ("number_bl", "invoice_number", "status", "eta", "shipping_line")
+    list_display = ("number_bl", "invoice_number", "shipping_line", "status", "eta", "investment")
     list_filter = ("status", "shipping_line", "port")
     search_fields = ("number_bl", "invoice_number")
+
+    fieldsets = (
+        ("General Information", {
+            "fields": ("number_bl", "invoice_number", "shipping_line", "status")
+        }),
+        ("Logistics", {
+            "fields": ("etd", "free_days", "eta", "port", "customs_agent")
+        }),
+        ("Financial Information", {
+            "fields": ("investment",)
+        }),
+        ("Additional Information", {
+            "fields": ("additional_info",)
+        }),
+    )
+
     inlines = [ContainerInline, DocumentInline]
 
+    class Media:
+        css = {
+            "all": ("gestion/css/admin_custom_styles.css",)
+        
+    }
 
 @admin.register(Container, site=custom_admin_site)
 class ContainerAdmin(admin.ModelAdmin):
