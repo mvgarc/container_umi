@@ -3,7 +3,7 @@ from django.contrib import admin
 from django.contrib.admin import AdminSite
 from django.urls import path, reverse
 from django.template.response import TemplateResponse
-from gestion.models import (
+from umi.gestion.models import (
     Container,
     PaymentPlan,
     Document,
@@ -97,7 +97,7 @@ class DocumentInline(admin.TabularInline):
 @admin.register(BillOfLading, site=custom_admin_site)
 class BillOfLadingAdmin(admin.ModelAdmin):
     list_display = ("number_bl", "invoice_number", "shipping_line", "status", "eta", "investment")
-    list_filter = ("status", "shipping_line", "port")
+    list_filter = ("status", "shipping_line", "departure_port", "arrival_port")
     search_fields = ("number_bl", "invoice_number")
 
     fieldsets = (
@@ -105,7 +105,7 @@ class BillOfLadingAdmin(admin.ModelAdmin):
             "fields": ("number_bl", "invoice_number", "shipping_line", "status")
         }),
         ("Logistics", {
-            "fields": ("etd", "free_days", "eta", "port", "customs_agent")
+            "fields": ("departure_port", "arrival_port", "etd", "free_days", "eta", "customs_agent")
         }),
         ("Financial Information", {
             "fields": ("investment",)
@@ -170,7 +170,8 @@ class ProductAdmin(admin.ModelAdmin):
 
 @admin.register(Port, site=custom_admin_site)
 class PortAdmin(admin.ModelAdmin):
-    list_display = ("name", "country")
+    list_display = ("name", "country", "port_type")
+    list_filter = ("port_type", "country")
     search_fields = ("name", "country")
 
 

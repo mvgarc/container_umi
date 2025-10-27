@@ -41,7 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    "gestion",
+    "umi.gestion",
     "django_extensions",
     "import_export",
 ]
@@ -74,7 +74,9 @@ TEMPLATES = [
     },
 ]
 
+ROOT_URLCONF = 'umi.urls'
 WSGI_APPLICATION = 'umi.wsgi.application'
+
 
 
 # Database
