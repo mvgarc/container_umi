@@ -72,8 +72,8 @@ TEMPLATES = [
     },
 ]
 
-ROOT_URLCONF = 'umi.urls'
-WSGI_APPLICATION = 'umi.wsgi.application'
+ROOT_URLCONF = 'umi.config.urls'
+WSGI_APPLICATION = 'umi.config.wsgi.application'
 
 
 

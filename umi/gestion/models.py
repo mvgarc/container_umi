@@ -86,7 +86,7 @@ class BillOfLading(models.Model):
     investment = models.DecimalField(max_digits=12, decimal_places=2, verbose_name="Freight Cost / Investment")
     customs_agent = models.ForeignKey(CustomsAgent, on_delete=models.SET_NULL, null=True, blank=True)
 
-    # 🔹 NUEVOS CAMPOS
+    # NUEVOS CAMPOS
     departure_port = models.ForeignKey(
         Port,
         related_name='departures',
@@ -167,7 +167,7 @@ class PaymentPlan(models.Model):
         ('partial', 'Partially Paid'),
     ]
 
-    # 🔹 CAMBIO: ahora opcional (se pueden crear pagos sin BL)
+    # CAMBIO: ahora opcional (se pueden crear pagos sin BL)
     bill_of_lading = models.ForeignKey(
         BillOfLading,
         on_delete=models.SET_NULL,
