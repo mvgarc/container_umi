@@ -6,10 +6,10 @@ from django.template.response import TemplateResponse
 from umi.gestion.models import (
     Container,
     PaymentPlan,
+    PaymentCategory,
     Document,
     ShippingLine,
     BillOfLading,
-    PaymentCategory,
     Supplier,
     Product,
     Port,
