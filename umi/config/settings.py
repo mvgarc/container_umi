@@ -41,7 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    "gestion",
+    "umi.gestion",
     "django_extensions",
     "import_export",
 ]
@@ -55,8 +55,6 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
-
-ROOT_URLCONF = 'umi.urls'
 
 TEMPLATES = [
     {
@@ -74,7 +72,9 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'umi.wsgi.application'
+ROOT_URLCONF = 'umi.config.urls'
+WSGI_APPLICATION = 'umi.config.wsgi.application'
+
 
 
 # Database
@@ -133,5 +133,6 @@ STATICFILES_DIRS = [
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-LOGIN_URL = '/admin/login/'
-LOGOUT_REDIRECT_URL = '/admin/login/'
+LOGIN_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = '/'
