@@ -23,5 +23,5 @@ __all__ = [
     "Product",
     "ShippingLine",
     "Supplier",
-    "Transshipment"
+    "Transshipment",
 ]
