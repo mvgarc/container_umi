@@ -31,7 +31,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -75,7 +74,7 @@ TEMPLATES = [
 ROOT_URLCONF = 'umi.config.urls'
 WSGI_APPLICATION = 'umi.config.wsgi.application'
 
-
+AUTH_USER_MODEL = 'gestion.CustomUser'
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
