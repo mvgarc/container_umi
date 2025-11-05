@@ -3,6 +3,8 @@ from django.contrib import admin
 from django.contrib.admin import AdminSite
 from django.urls import path, reverse
 from django.template.response import TemplateResponse
+
+#  Importación de modelos
 from umi.gestion.models import (
     Container,
     PaymentPlan,
@@ -14,13 +16,28 @@ from umi.gestion.models import (
     Product,
     Port,
     CustomsAgent,
+    CustomUser
 )
 
+#  Admin personalizado del usuario
+from umi.gestion.admin.user_admin import CustomUserAdmin
 
+
+# =========================
+# Custom Admin Site
+# =========================
 class CustomAdminSite(AdminSite):
     site_header = "UMI Administration"
     site_title = "UMI Admin"
     index_title = "Welcome to UMI Dashboard"
+
+    def has_permission(self, request):
+        """
+        Solo permite acceso al admin si el usuario es activo
+        y tiene un rol válido de 'admin' o 'manager'.
+        """
+        user = request.user
+        return user.is_active and getattr(user, "role", None) in ["admin", "manager"]
 
     def get_urls(self):
         urls = super().get_urls()
@@ -29,17 +46,17 @@ class CustomAdminSite(AdminSite):
             today = date.today()
             upcoming_deadline = today + timedelta(days=30)
 
-            # Metrics
+            # Métricas generales
             total_contenedores = Container.objects.count()
             total_navieras = ShippingLine.objects.count()
             total_facturas = PaymentPlan.objects.count()
 
-            # Payments
+            # Pagos
             pagos_pendientes = PaymentPlan.objects.filter(status="pending").count()
             pagos_abonados = PaymentPlan.objects.filter(status="partial").count()
             pagos_pagados = PaymentPlan.objects.filter(status="paid").count()
 
-            # Documents
+            # Documentos
             documentos_proximos = Document.objects.filter(
                 expiry_date__isnull=False,
                 expiry_date__lte=upcoming_deadline,
@@ -51,7 +68,7 @@ class CustomAdminSite(AdminSite):
                 expiry_date__lt=today
             ).count()
 
-            # Dynamic URLs
+            # URLs dinámicas
             urls_acceso = {
                 "container_list": reverse("custom_admin:gestion_container_changelist"),
                 "container_add": reverse("custom_admin:gestion_container_add"),
@@ -61,6 +78,7 @@ class CustomAdminSite(AdminSite):
                 "document_add": reverse("custom_admin:gestion_document_add"),
             }
 
+            # Contexto del dashboard
             context = dict(
                 self.each_context(request),
                 title="Dashboard UMI",
@@ -81,9 +99,13 @@ class CustomAdminSite(AdminSite):
         return custom_urls + urls
 
 
+# Instancia global del Admin personalizado
 custom_admin_site = CustomAdminSite(name="custom_admin")
 
 
+# =========================
+# Inlines
+# =========================
 class ContainerInline(admin.TabularInline):
     model = Container
     extra = 1
@@ -94,6 +116,9 @@ class DocumentInline(admin.TabularInline):
     extra = 1
 
 
+# =========================
+# Admins de modelos
+# =========================
 @admin.register(BillOfLading, site=custom_admin_site)
 class BillOfLadingAdmin(admin.ModelAdmin):
     list_display = ("number_bl", "invoice_number", "shipping_line", "status", "eta", "investment")
@@ -118,10 +143,8 @@ class BillOfLadingAdmin(admin.ModelAdmin):
     inlines = [ContainerInline, DocumentInline]
 
     class Media:
-        css = {
-            "all": ("gestion/css/admin_custom_styles.css",)
-        
-    }
+        css = {"all": ("gestion/css/admin_custom_styles.css",)}
+
 
 @admin.register(Container, site=custom_admin_site)
 class ContainerAdmin(admin.ModelAdmin):
@@ -179,3 +202,9 @@ class PortAdmin(admin.ModelAdmin):
 class CustomsAgentAdmin(admin.ModelAdmin):
     list_display = ("name", "phone", "email")
     search_fields = ("name", "email")
+
+
+# =========================
+#  Admin de Usuarios
+# =========================
+custom_admin_site.register(CustomUser, CustomUserAdmin)
