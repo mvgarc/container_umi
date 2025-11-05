@@ -9,6 +9,7 @@ from .product import Product
 from .shipping import ShippingLine
 from .supplier import Supplier
 from .transshipment import Transshipment
+from .user import CustomUser
 
 # Opcional: define qué se exporta al usar `from umi.gestion.models import *`
 __all__ = [
@@ -24,4 +25,5 @@ __all__ = [
     "ShippingLine",
     "Supplier",
     "Transshipment",
+    "CustomUser",
 ]
