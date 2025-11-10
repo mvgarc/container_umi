@@ -39,3 +39,5 @@ htmlcov/
 test-results/
 .pdf
 *.pdf
+.zip
+*.zip
