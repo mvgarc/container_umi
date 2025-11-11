@@ -1,12 +1,9 @@
-"""
-Django settings for umi project.
-"""
-
 from pathlib import Path
 import os
 from dotenv import load_dotenv
+from django.utils.translation import gettext_lazy as _
 
-# 🔹 Cargar variables desde .env
+
 load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -17,10 +14,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv("SECRET_KEY", "clave_insegura_dev")
 
-# Usa DEBUG=True solo en local
 DEBUG = False if os.getenv("DJANGO_ENV") == "production" else True
 
-# En producción, agrega el dominio de AWS o tu dominio
 ALLOWED_HOSTS = ['.elasticbeanstalk.com', '*']
 
 
@@ -100,11 +95,20 @@ AUTH_PASSWORD_VALIDATORS = [
 # INTERNACIONALIZACIÓN
 # ============================================================
 
-LANGUAGE_CODE = "es-ve"
+LANGUAGE_CODE = 'es'
 TIME_ZONE = "America/Caracas"
 USE_I18N = True
+USE_L10N = True
 USE_TZ = True
 
+LANGUAGES = [
+    ('es', _('Español')),
+    ('en', _('Inglés')),
+]
+
+LOCALE_PATHS = [
+    BASE_DIR / 'locale',
+]
 
 # ============================================================
 # ARCHIVOS ESTÁTICOS Y MEDIA
