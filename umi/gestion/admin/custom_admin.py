@@ -11,12 +11,15 @@ from umi.gestion.models import (
     PaymentCategory,
     Document,
     ShippingLine,
+    ShippingLineEmail,
+    ShippingLinePhone,
     BillOfLading,
     Supplier,
     Product,
     Port,
     CustomsAgent,
-    CustomUser
+    CustomUser,
+    PaymentAttachment,
 )
 
 #  Admin personalizado del usuario
@@ -114,6 +117,13 @@ class ContainerInline(admin.TabularInline):
 class DocumentInline(admin.TabularInline):
     model = Document
     extra = 1
+class ShippingLineEmailInline(admin.TabularInline):
+    model = ShippingLineEmail
+    extra = 1 
+
+class ShippingLinePhoneInline(admin.TabularInline):
+    model = ShippingLinePhone
+    extra = 1
 
 
 # =========================
@@ -160,17 +170,25 @@ class DocumentAdmin(admin.ModelAdmin):
     search_fields = ("name",)
 
 
+class PaymentAttachmentInline(admin.TabularInline):
+    model = PaymentAttachment
+    extra = 1
+    fields = ('file', 'uploaded_at')
+    readonly_fields = ('uploaded_at',)
+
 @admin.register(PaymentPlan, site=custom_admin_site)
 class PaymentPlanAdmin(admin.ModelAdmin):
     list_display = ("invoice_number", "status", "amount", "provider")
-    list_filter = ("status", "shipping_line")
+    list_filter = ("status", "shipping_line", "category")
     search_fields = ("invoice_number", "provider")
+    inlines = [PaymentAttachmentInline]
 
 
 @admin.register(ShippingLine, site=custom_admin_site)
 class ShippingLineAdmin(admin.ModelAdmin):
     list_display = ("name",)
     search_fields = ("name",)
+    inlines = [ShippingLineEmailInline, ShippingLinePhoneInline]
 
 
 @admin.register(PaymentCategory, site=custom_admin_site)

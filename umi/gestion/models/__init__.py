@@ -6,12 +6,11 @@ from .document import Document
 from .payment import PaymentPlan, PaymentCategory, PaymentAttachment
 from .port import Port
 from .product import Product
-from .shipping import ShippingLine
+from .shipping import ShippingLine, ShippingLineEmail, ShippingLinePhone
 from .supplier import Supplier
 from .transshipment import Transshipment
 from .user import CustomUser
 
-# Opcional: define qué se exporta al usar `from umi.gestion.models import *`
 __all__ = [
     "BillOfLading",
     "Container",
@@ -23,7 +22,10 @@ __all__ = [
     "Port",
     "Product",
     "ShippingLine",
+    "ShippingLineEmail",
+    "ShippingLinePhone",
     "Supplier",
     "Transshipment",
     "CustomUser",
+    
 ]

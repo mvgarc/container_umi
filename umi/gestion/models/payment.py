@@ -1,6 +1,7 @@
 from django.db import models
 from .bill_of_lading import BillOfLading
 from .shipping import ShippingLine
+import os
 
 
 # ===================== CATEGORÍAS DE PAGO =====================
@@ -50,3 +51,9 @@ class PaymentAttachment(models.Model):
 
     def __str__(self):
         return f"Attachment for {self.payment.invoice_number}"
+
+    def file_name(self):
+        return os.path.basename(self.file.name)
+
+    def file_url(self):
+        return self.file.url
