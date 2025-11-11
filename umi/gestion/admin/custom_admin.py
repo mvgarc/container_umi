@@ -4,7 +4,6 @@ from django.contrib.admin import AdminSite
 from django.urls import path, reverse
 from django.template.response import TemplateResponse
 
-#  Importación de modelos
 from umi.gestion.models import (
     Container,
     PaymentPlan,
@@ -15,6 +14,8 @@ from umi.gestion.models import (
     ShippingLinePhone,
     BillOfLading,
     Supplier,
+    SupplierPhone,
+    SupplierEmail,
     Product,
     Port,
     CustomsAgent,
@@ -22,7 +23,6 @@ from umi.gestion.models import (
     PaymentAttachment,
 )
 
-#  Admin personalizado del usuario
 from umi.gestion.admin.user_admin import CustomUserAdmin
 
 
@@ -35,10 +35,6 @@ class CustomAdminSite(AdminSite):
     index_title = "Welcome to UMI Dashboard"
 
     def has_permission(self, request):
-        """
-        Solo permite acceso al admin si el usuario es activo
-        y tiene un rol válido de 'admin' o 'manager'.
-        """
         user = request.user
         return user.is_active and getattr(user, "role", None) in ["admin", "manager"]
 
@@ -102,7 +98,6 @@ class CustomAdminSite(AdminSite):
         return custom_urls + urls
 
 
-# Instancia global del Admin personalizado
 custom_admin_site = CustomAdminSite(name="custom_admin")
 
 
@@ -125,10 +120,15 @@ class ShippingLinePhoneInline(admin.TabularInline):
     model = ShippingLinePhone
     extra = 1
 
+class SupplierPhoneInline(admin.TabularInline):
+    model = SupplierPhone
+    extra = 1
 
-# =========================
-# Admins de modelos
-# =========================
+class SupplierEmailInline(admin.TabularInline):
+    model = SupplierEmail
+    extra = 1
+
+
 @admin.register(BillOfLading, site=custom_admin_site)
 class BillOfLadingAdmin(admin.ModelAdmin):
     list_display = ("number_bl", "invoice_number", "shipping_line", "status", "eta", "investment")
@@ -201,6 +201,7 @@ class PaymentCategoryAdmin(admin.ModelAdmin):
 class SupplierAdmin(admin.ModelAdmin):
     list_display = ("name", "contact_person")
     search_fields = ("name", "contact_person")
+    inlines = [SupplierEmailInline, SupplierPhoneInline]
 
 
 @admin.register(Product, site=custom_admin_site)
@@ -222,7 +223,4 @@ class CustomsAgentAdmin(admin.ModelAdmin):
     search_fields = ("name", "email")
 
 
-# =========================
-#  Admin de Usuarios
-# =========================
 custom_admin_site.register(CustomUser, CustomUserAdmin)

@@ -1,4 +1,3 @@
-# Centraliza todos los modelos del módulo gestion
 from .bill_of_lading import BillOfLading
 from .container import Container
 from .customs import CustomsAgent
@@ -7,7 +6,7 @@ from .payment import PaymentPlan, PaymentCategory, PaymentAttachment
 from .port import Port
 from .product import Product
 from .shipping import ShippingLine, ShippingLineEmail, ShippingLinePhone
-from .supplier import Supplier
+from .supplier import Supplier, SupplierEmail, SupplierPhone
 from .transshipment import Transshipment
 from .user import CustomUser
 
@@ -25,6 +24,8 @@ __all__ = [
     "ShippingLineEmail",
     "ShippingLinePhone",
     "Supplier",
+    "SupplierPhone",
+    "SupplierEmail",
     "Transshipment",
     "CustomUser",
     
