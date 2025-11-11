@@ -3,6 +3,7 @@ from django.contrib import admin
 from django.contrib.admin import AdminSite
 from django.urls import path, reverse
 from django.template.response import TemplateResponse
+from django.utils.translation import gettext_lazy as _ 
 
 from umi.gestion.models import (
     Container,
@@ -24,15 +25,10 @@ from umi.gestion.models import (
 )
 
 from umi.gestion.admin.user_admin import CustomUserAdmin
-
-
-# =========================
-# Custom Admin Site
-# =========================
 class CustomAdminSite(AdminSite):
-    site_header = "UMI Administration"
-    site_title = "UMI Admin"
-    index_title = "Welcome to UMI Dashboard"
+    site_header = _("UMI Administración")
+    site_title = _("Admin UMI")
+    index_title = _("Bienvenido al Panel de UMI")
 
     def has_permission(self, request):
         user = request.user
@@ -45,7 +41,6 @@ class CustomAdminSite(AdminSite):
             today = date.today()
             upcoming_deadline = today + timedelta(days=30)
 
-            # Métricas generales
             total_contenedores = Container.objects.count()
             total_navieras = ShippingLine.objects.count()
             total_facturas = PaymentPlan.objects.count()
@@ -67,7 +62,6 @@ class CustomAdminSite(AdminSite):
                 expiry_date__lt=today
             ).count()
 
-            # URLs dinámicas
             urls_acceso = {
                 "container_list": reverse("custom_admin:gestion_container_changelist"),
                 "container_add": reverse("custom_admin:gestion_container_add"),
@@ -80,7 +74,7 @@ class CustomAdminSite(AdminSite):
             # Contexto del dashboard
             context = dict(
                 self.each_context(request),
-                title="Dashboard UMI",
+                title=_("Dashboard UMI"), 
                 total_contenedores=total_contenedores,
                 total_navieras=total_navieras,
                 total_facturas=total_facturas,
@@ -100,10 +94,6 @@ class CustomAdminSite(AdminSite):
 
 custom_admin_site = CustomAdminSite(name="custom_admin")
 
-
-# =========================
-# Inlines
-# =========================
 class ContainerInline(admin.TabularInline):
     model = Container
     extra = 1
@@ -128,7 +118,6 @@ class SupplierEmailInline(admin.TabularInline):
     model = SupplierEmail
     extra = 1
 
-
 @admin.register(BillOfLading, site=custom_admin_site)
 class BillOfLadingAdmin(admin.ModelAdmin):
     list_display = ("number_bl", "invoice_number", "shipping_line", "status", "eta", "investment")
@@ -136,16 +125,16 @@ class BillOfLadingAdmin(admin.ModelAdmin):
     search_fields = ("number_bl", "invoice_number")
 
     fieldsets = (
-        ("General Information", {
+        (_("Información General"), { 
             "fields": ("number_bl", "invoice_number", "shipping_line", "status")
         }),
-        ("Logistics", {
+        (_("Logística"), {
             "fields": ("departure_port", "arrival_port", "etd", "free_days", "eta", "customs_agent")
         }),
-        ("Financial Information", {
+        (_("Información Financiera"), {
             "fields": ("investment",)
         }),
-        ("Additional Information", {
+        (_("Información Adicional"), {
             "fields": ("additional_info",)
         }),
     )
