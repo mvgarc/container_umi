@@ -10,7 +10,7 @@ staticfiles/
 static/
 
 # Environment
-.env
+.envn
 *.env
 
 # IDEs

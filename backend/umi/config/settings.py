@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     "umi.gestion",
     "django_extensions",
     "import_export",
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
