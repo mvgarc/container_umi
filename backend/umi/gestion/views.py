@@ -7,7 +7,7 @@ def home(request):
     return HttpResponse("Bienvenido a la app de gestión")
 
 # Dashboard general (acceso amplio)
-@role_required(['admin', 'manager', 'operator'])
+@role_required(['admin', 'manager', 'operator', 'viewer' ])
 def dashboard_view(request):
     return render(request, 'admin/dashboard.html')
 
