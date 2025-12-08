@@ -1,0 +1,78 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block extrastyle %}
+<link rel="stylesheet" href="{% static 'gestion/css/dashboard.css' %}">
+{% endblock %}
+
+{% block content %}
+<div id="main-dashboard-content">
+
+    {% if documentos_proximos > 0 or documentos_vencidos > 0 %}
+    <div class="warning-banner floating-alert">
+        {% if documentos_proximos > 0 %}
+        ⚠️ {{ documentos_proximos }} documentos próximos a vencer.
+        {% endif %}
+        {% if documentos_vencidos > 0 %}
+        📄 {{ documentos_vencidos }} documentos vencidos.
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <div class="dashboard-cards"> <!-- 👈 aquí el contenedor correcto -->
+
+        <div class="dashboard-card">
+            <h3>Total Contenedores</h3>
+            <p>{{ total_contenedores }}</p>
+            <div class="card-links">
+                <a href="{{ container_list }}">Ver Lista</a>
+                <a href="{{ container_add }}">+ Añadir</a>
+            </div>
+        </div>
+
+        <div class="dashboard-card warning">
+            <h3>Pagos Pendientes</h3>
+            <p>{{ pagos_pendientes }}</p>
+            <div class="card-links">
+                <a href="{{ paymentplan_list }}">Ver Pagos</a>
+                <a href="{{ paymentplan_add }}">+ Añadir</a>
+            </div>
+        </div>
+
+        <div class="dashboard-card info">
+            <h3>Pagos Abonados</h3>
+            <p>{{ pagos_abonados }}</p>
+            <div class="card-links">
+                <a href="{{ paymentplan_list }}">Ver Pagos</a>
+            </div>
+        </div>
+
+        <div class="dashboard-card success">
+            <h3>Pagos Realizados</h3>
+            <p>{{ pagos_realizados }}</p>
+            <div class="card-links">
+                <a href="{{ paymentplan_list }}">Ver Pagos</a>
+            </div>
+        </div>
+
+        <div class="dashboard-card warning">
+            <h3>Documentos Próximos a Vencer</h3>
+            <p>{{ documentos_proximos }}</p>
+            <div class="card-links">
+                <a href="{{ document_list }}">Ver Documentos</a>
+                <a href="{{ document_add }}">+ Añadir</a>
+            </div>
+        </div>
+
+        <div class="dashboard-card danger">
+            <h3>Documentos Vencidos</h3>
+            <p>{{ documentos_vencidos }}</p>
+            <div class="card-links">
+                <a href="{{ document_list }}">Ver Documentos</a>
+            </div>
+        </div>
+
+    </div> <!-- cierre de .dashboard-cards -->
+
+</div>
+{% endblock %}

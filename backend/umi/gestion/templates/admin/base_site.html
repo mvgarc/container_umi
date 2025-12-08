@@ -1,0 +1,20 @@
+{% extends "admin/base.html" %}
+{% load static i18n %}
+
+{% block branding %}
+    <div class="logo-container">
+        <img src="{% static 'gestion/img/logo-2.png' %}" alt="UMI Logo" class="logo">
+    </div>
+{% endblock %}
+
+{% block userlinks %}
+    {% if user.is_active and user.is_staff %}
+        <a href="{% url 'admin:password_change' %}">{% trans 'Cambiar contraseña' %}</a> |
+        <form id="logout-form" method="post" action="{% url 'admin:logout' %}" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit" style="background:none;border:none;color:#ffffff;cursor:pointer;">
+                {% trans 'Cerrar sesión' %}
+            </button>
+        </form>
+    {% endif %}
+{% endblock %}
