@@ -97,8 +97,7 @@ custom_admin_site = CustomAdminSite(name="custom_admin")
 class ContainerInline(admin.TabularInline):
     model = Container
     extra = 1
-    autocomplete_fields = ["products"]
-
+    autocomplete_fields = ["product"]
 
 class DocumentInline(admin.TabularInline):
     model = Document
