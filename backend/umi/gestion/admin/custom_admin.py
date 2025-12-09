@@ -96,27 +96,46 @@ custom_admin_site = CustomAdminSite(name="custom_admin")
 
 class ContainerInline(admin.TabularInline):
     model = Container
-    extra = 1
-    autocomplete_fields = ["product"]
+    extra = 0  # No mostrar fila en blanco
+    autocomplete_fields = ["products"]  # Corrección importante
+    can_delete = True
+    show_change_link = True
+
 
 class DocumentInline(admin.TabularInline):
     model = Document
-    extra = 1
+    extra = 0
+    can_delete = True
+    show_change_link = True
+
+
 class ShippingLineEmailInline(admin.TabularInline):
     model = ShippingLineEmail
-    extra = 1 
+    extra = 0
+    can_delete = True
+    show_change_link = True
+
 
 class ShippingLinePhoneInline(admin.TabularInline):
     model = ShippingLinePhone
-    extra = 1
+    extra = 0
+    can_delete = True
+    show_change_link = True
+
 
 class SupplierPhoneInline(admin.TabularInline):
     model = SupplierPhone
-    extra = 1
+    extra = 0
+    can_delete = True
+    show_change_link = True
+
 
 class SupplierEmailInline(admin.TabularInline):
     model = SupplierEmail
-    extra = 1
+    extra = 0
+    can_delete = True
+    show_change_link = True
+
 
 @admin.register(BillOfLading, site=custom_admin_site)
 class BillOfLadingAdmin(admin.ModelAdmin):
