@@ -1,4 +1,5 @@
-# Container UMI -- Logistics Document Management System
+# Container UMI
+Logistics Document Management System
 
 ## Overview
 
